@@ -5,7 +5,7 @@ Set Environment & Install
 ติดตั้ง python https://www.python.org/downloads/
 
 #### Set Virtual Environment:
-```powershell 
+```powershell
 python -m venv ${myenv} #ตั้งชื่ออะไรก็ได้
 ```
 > เป็นคำสั่งที่ใช้สร้าง Virtual Environment (สภาพแวดล้อมเสมือน) ใน Python ซึ่งช่วยให้เราสามารถแยกแพ็กเกจและไลบรารีของแต่ละโปรเจกต์ออกจากกันได้
@@ -41,6 +41,36 @@ pip install -r requirements.txt
 robot --version
 ```
 
-
+Start testing
 ---------------
+ไฟล์ `.robot` ใช้สำหรับเขียน สคริปต์การทดสอบอัตโนมัติ ด้วย Robot Framework ซึ่งเป็นเครื่องมือที่ใช้ภาษาแบบ Keyword-Driven สำหรับการทดสอบระบบต่าง ๆ
 
+สร้างไฟล์ทดสอบ `easy_easy.robot` ในโปรเจค 🫠
+```robot
+*** Settings ***
+Documentation     Example using the space separated format.
+Library           OperatingSystem
+
+*** Variables ***
+${MESSAGE}        Hello, world!
+
+*** Test Cases ***
+My Test
+    [Documentation]    Example test.
+    Log    ${MESSAGE}
+    My Keyword    ${CURDIR}
+
+Another Test
+    Should Be Equal    ${MESSAGE}    Hello, world!
+
+*** Keywords ***
+My Keyword
+    [Arguments]    ${path}
+    Directory Should Exist    ${path}
+```
+#### Run Test
+```powershell 
+robot easy_easy.robot
+```
+
+![alt text](./doc/pics/{2842DE82-81BB-4DDC-A8EB-CEB31FCD4076}.png)

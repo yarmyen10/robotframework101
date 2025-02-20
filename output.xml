@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.2.2 (Python 3.13.2 on win32)" generated="2025-02-20T22:41:58.376496" rpa="false" schemaversion="5">
+<suite id="s1" name="Easy Easy" source="C:\Users\Phong\Documents\GitHub\robotframework101\easy_easy.robot">
+<test id="s1-t1" name="My Test" line="9">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-02-20T22:41:58.478175" level="INFO">Hello, world!</msg>
+<arg>${MESSAGE}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-02-20T22:41:58.477951" elapsed="0.000298"/>
+</kw>
+<kw name="My Keyword">
+<kw name="Directory Should Exist" owner="OperatingSystem">
+<msg time="2025-02-20T22:41:58.479640" level="INFO" html="true">Directory '&lt;a href="file://C:\Users\Phong\Documents\GitHub\robotframework101"&gt;C:\Users\Phong\Documents\GitHub\robotframework101&lt;/a&gt;' exists.</msg>
+<arg>${path}</arg>
+<doc>Fails unless the given path points to an existing directory.</doc>
+<status status="PASS" start="2025-02-20T22:41:58.479146" elapsed="0.000614"/>
+</kw>
+<arg>C:\\Users\\Phong\\Documents\\GitHub\\robotframework101</arg>
+<status status="PASS" start="2025-02-20T22:41:58.478725" elapsed="0.001177"/>
+</kw>
+<doc>Example test.</doc>
+<status status="PASS" start="2025-02-20T22:41:58.476932" elapsed="0.003708"/>
+</test>
+<test id="s1-t2" name="Another Test" line="14">
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${MESSAGE}</arg>
+<arg>Hello, world!</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2025-02-20T22:41:58.483219" elapsed="0.000334"/>
+</kw>
+<status status="PASS" start="2025-02-20T22:41:58.482362" elapsed="0.001749"/>
+</test>
+<doc>Example using the space separated format.</doc>
+<status status="PASS" start="2025-02-20T22:41:58.377656" elapsed="0.108164"/>
+</suite>
+<statistics>
+<total>
+<stat pass="2" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="Easy Easy" id="s1" pass="2" fail="0" skip="0">Easy Easy</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
