@@ -11,3 +11,4 @@ python -m venv ${myenv} <- ตั้งชื่ออะไรก็ได้
 myenv/Scripts/activate 
 ```
 > เป็นสคริปต์ที่ใช้ เปิดใช้งาน Virtual Environment ที่สร้างขึ้นด้วย python -m venv บน Windows
+>> ถ้าใช้ PowerShell แล้ว `Activate` ไม่ได้ ทำ Bypass ```Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass```
