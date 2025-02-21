@@ -1,9 +1,3 @@
-Chapter 1
-===============
-
-การใช้งาน Test Case, Keywords, และ Variables
----------------
-```robot
 *** Settings ***
 Library    SeleniumLibrary
 
@@ -13,5 +7,3 @@ Search Google
     Input Text    xpath=//*[@id="APjFqb"]    คนบ้านเรา
     Click Element    xpath=//div[3]/center/input
     [Teardown]    Close Browser
-```
-

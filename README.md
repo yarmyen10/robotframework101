@@ -47,7 +47,7 @@ Start testing
 
 สร้างไฟล์ทดสอบ `easy_easy.robot` ในโปรเจค 🫠
 > แนะนำให้ใช้ Editor VS Code https://code.visualstudio.com/
->> ลง Extension เสริม -> Robot Framework Language Server
+>> ลง Extension เสริม -> Robot Framework Language Server หรือ RobotCode - Robot Framework
 ```robot
 *** Settings ***
 Documentation     Example using the space separated format. 
