@@ -1,23 +1,30 @@
 Robotframework101 Step-By-Step
 ===============
+
 Set Environment & Install
 ---------------
-ติดตั้ง python https://www.python.org/downloads/
+
+ติดตั้ง python <https://www.python.org/downloads/>
 
 #### Set Virtual Environment:
+---------------
 ```powershell
 python -m venv ${myenv} #ตั้งชื่ออะไรก็ได้
 ```
+
 > เป็นคำสั่งที่ใช้สร้าง Virtual Environment (สภาพแวดล้อมเสมือน) ใน Python ซึ่งช่วยให้เราสามารถแยกแพ็กเกจและไลบรารีของแต่ละโปรเจกต์ออกจากกันได้
 
 #### Activate:
-```powershell 
+
+```powershell
 myenv/Scripts/activate 
 ```
+
 > เป็นสคริปต์ที่ใช้ เปิดใช้งาน Virtual Environment ที่สร้างขึ้นด้วย python -m venv บน Windows
 >> ถ้าใช้ PowerShell แล้ว `Activate` ไม่ได้ ทำ Bypass ```Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass``` ถ้ายังไม่ได้ `สวดมนต์ 😒` ไม่ก็ไปที Terminal อื่น
 
 #### Install Requirements:
+
 สร้าง ` requirements.txt ` สำหรับลง Lib ที่เกี่ยวกับ Robot Framework
 
 ```txt
@@ -31,10 +38,12 @@ robotframework-seleniumlibrary >= 3.3.1 # ใช้ Selenium ทดสอบเ�
 ```powershell
 pip install -r requirements.txt
 ```
+
 > ใช้สำหรับติดตั้งแพ็กเกจ Python ทั้งหมดที่ระบุในไฟล์ `requirements.txt`
 >> ตรวจสอบว่ามี pip ไหม `pip --version`
 
-#### ลองทดสอบคำสั่ง Robot 
+#### ลองทดสอบคำสั่ง Robot:
+>
 > อย่าลืม [Activate:](#activate) project ก่อน
 
 ```powershell
@@ -43,11 +52,13 @@ robot --version
 
 Start testing
 ---------------
+
 ไฟล์ `.robot` ใช้สำหรับเขียน สคริปต์การทดสอบอัตโนมัติ ด้วย Robot Framework ซึ่งเป็นเครื่องมือที่ใช้ภาษาแบบ Keyword-Driven สำหรับการทดสอบระบบต่าง ๆ
 
 สร้างไฟล์ทดสอบ `easy_easy.robot` ในโปรเจค 🫠
-> แนะนำให้ใช้ Editor VS Code https://code.visualstudio.com/
+> แนะนำให้ใช้ Editor VS Code <https://code.visualstudio.com/>
 >> ลง Extension เสริม -> Robot Framework Language Server หรือ RobotCode - Robot Framework
+
 ```robot
 *** Settings ***
 Documentation     Example using the space separated format. 
@@ -81,9 +92,19 @@ My Keyword
     Directory Should Exist    ${path} 
     # Directory Should Exist ${path}: คำสั่งที่ตรวจสอบว่าไดเรกทอรีที่กำหนดใน ${path} มีอยู่จริงหรือไม่ ถ้าไม่ตรงจะล้มเหลว
 ```
-#### Run Test
-```powershell 
+
+#### Run Test:
+
+```powershell
 robot easy_easy.robot
 ```
 
 ![alt text](./doc/pics/{2842DE82-81BB-4DDC-A8EB-CEB31FCD4076}.png)
+
+### **🔹 เว็บไซต์สำหรับทดลอง Automate Testing**  
+
+1. **[Automation Testing Playground](https://www.automationtesting.co.uk/playground/)** – เว็บไซต์ที่จำลองสถานการณ์ให้ทดสอบ UI Automation ด้วย Selenium, Cypress, Playwright  
+2. **[UI Test Automation Playground](https://uitestingplayground.com/)** – ใช้ทดสอบการเขียน Automation Test สำหรับ UI  
+3. **[Selenium Playground](https://www.seleniumeasy.com/test/)** – สำหรับฝึกใช้ Selenium และ WebDriver  
+4. **[Reqres](https://reqres.in/)** – ให้ API Mock สำหรับทดสอบ API Automation  
+5. **[Mocky](https://www.mocky.io/)** – สร้าง API Mock เพื่อทดสอบ API Testing
