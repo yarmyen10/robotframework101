@@ -47,6 +47,11 @@ Demo For Loop
         Log    This is loop number ${i}
     END
 
+Loop With Step
+    FOR    ${i}    IN RANGE    0    10    2
+        Log    ${i}
+    END
+
 Convert Values To String
     ${str_num}    Convert To String    123
     ${str_bool}   Convert To String    ${True}
