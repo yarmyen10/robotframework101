@@ -75,3 +75,20 @@ Get Greeting
     [Arguments]    ${name}
     ${greeting}    Set Variable    Hello, ${name}!
     RETURN    ${greeting}
+
+
+*** Settings ***
+Variables    variables.json
+
+*** Test Cases ***
+Demo Variables from JSON
+    Log    Name: ${name}
+    Log    Age: ${age}
+    Log    First Fruit: ${fruits}[0]
+    Log    Username: ${user_json.username}
+    FOR    ${i}    IN RANGE    0    ${fruits.__len__()}
+        Log    ${fruits}[${i}]
+    END
+    FOR    ${fruit}  IN    @{fruits}
+        Log    ${fruit}
+    END

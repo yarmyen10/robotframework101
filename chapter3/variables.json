@@ -1,0 +1,13 @@
+{
+    "name": "Alice",
+    "age": 25,
+    "fruits": [
+        "Apple",
+        "Banana",
+        "Orange"
+    ],
+    "user_json": {
+        "username": "admin",
+        "password": "1234"
+    }
+}
