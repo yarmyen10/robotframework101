@@ -108,3 +108,6 @@ robot easy_easy.robot
 3. **[Selenium Playground](https://www.seleniumeasy.com/test/)** – สำหรับฝึกใช้ Selenium และ WebDriver  
 4. **[Reqres](https://reqres.in/)** – ให้ API Mock สำหรับทดสอบ API Automation  
 5. **[Mocky](https://www.mocky.io/)** – สร้าง API Mock เพื่อทดสอบ API Testing
+6. **[BadSSL](https://badssl.com/)**
+7. **[Docs Robot Framework](https://docs.robotframework.org/)**
+8. **[Chromium](https://download-chromium.appspot.com/)**
