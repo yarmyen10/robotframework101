@@ -24,7 +24,7 @@ Bypass SSL Warning Using Capabilities in Edge
     Sleep    5s
     Close Browser
 
-TEST01
+Test Pause Execution
     ${options}=    Evaluate    sys.modules['selenium.webdriver'].EdgeOptions()    sys, selenium.webdriver
     Call Method    ${options}    add_argument    --ignore-certificate-errors
     Call Method    ${options}    add_argument    --allow-insecure-localhost
