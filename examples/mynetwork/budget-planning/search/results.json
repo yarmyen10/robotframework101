@@ -1,0 +1,21 @@
+{
+    "searchCapex": {
+        "ezCase": {
+            "detail": "",
+            "inputList": [
+                {
+                    "type": "text",
+                    "locator": "textSearch",
+                    "value": "CP25-90002776"
+                }
+            ],
+            "checkList": [
+                {
+                    "keyword": "Element Text Should Be",
+                    "locator": "//*[@id=\"panel-information\"]/div/div[1]/div[2]/span",
+                    "expected": "CP25-90002776"
+                }
+            ]
+        }
+    }
+}
