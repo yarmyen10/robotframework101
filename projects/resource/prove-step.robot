@@ -1,4 +1,5 @@
 *** Settings ***
+Library    SeleniumLibrary
 Library    ../lib/read-record.py
 
 *** Variables ***
@@ -13,9 +14,32 @@ Switch Case TestCase
     FOR    ${ITEM}    IN    @{LIST_OBJECTS}
         ${_STEP}=    Set Variable    ${ITEM['Step']}
         ${_DATA}=    Set Variable    ${ITEM['Data']}
-        Log To Console    ${_STEP}
+        ${_XPATH}=    Set Variable    ${ITEM['XPath']}
+        ${_CSSSELECTOR}=    Set Variable    ${ITEM['cssSelector']}
+        # Log To Console    ${_XPATH}
         ${IS_START_WITH_ENTER}=    Run Keyword And Return Status    Should Start With    ${_STEP}    Enter
-        Run Keyword If    '${_STEP}' == 'Open website'    Log To Console    Open Website: ${_DATA}
-        ...    ELSE IF    ${IS_START_WITH_ENTER}    Log To Console    Enter Test: ${_DATA}
-        ...    ELSE    Log To Console    Default Case: ${_DATA}
+        ${IS_START_WITH_CLICK_ON}=    Run Keyword And Return Status    Should Start With    ${_STEP}    Click on
+        
+        Run Keyword IF    '${_STEP}' == 'Open website'    
+        ...    Log To Console    Open Website: ${_DATA}
+
+        # ...    ELSE IF    ${IS_START_WITH_ENTER}    
+        # ...    Run Keywords    
+        # ...        Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Enter step
+        # ...    AND    Should Not Be Empty    ${_DATA}    msg=Missing DATA for Enter step
+        # ...    AND    Input Text    ${_XPATH}    ${_DATA}
+
+        # ...    ELSE IF    ${IS_START_WITH_CLICK_ON}    
+        # ...    Run Keywords    
+        # ...        Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Click step
+        # ...    AND    Click Element    ${_XPATH}
+
+        # ...    ELSE IF    ${IS_START_WITH_SELECT}    
+        # ...    Run Keywords    
+        # ...        Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Select step
+        # ...    AND    Should Not Be Empty    ${_DATA}    msg=Missing DATA for Select step
+        # ...    AND    Select From List By Value    ${_XPATH}    ${_DATA}
+
+        ...    ELSE    
+        ...    Log To Console    Default Case: ${_STEP} / ${_DATA}
     END

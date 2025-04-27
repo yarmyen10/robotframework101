@@ -19,7 +19,7 @@ def read_csv_file_test_case(file_path, rows_to_skip=0, encoding='utf-8'):
         
         # Extract the header (keys)
         keys = next(csv_reader, None)
-        print(f"Keys (Header): {keys}")
+        # print(f"Keys (Header): {keys}")
         # Convert rows to list of dictionaries
         data = [dict(zip(keys, row)) for row in csv_reader]
         return data
