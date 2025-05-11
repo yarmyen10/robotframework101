@@ -6,13 +6,13 @@ Resource    kw.robot
 
 *** Variables ***
 @{LIST_OBJECTS}    ${EMPTY}
-${OPTIONS}    ${EMPTY}
+${OPEN_STATUS}    ${EMPTY}
 
-*** Test Cases ***
-Switch TestCase
-    ${PATH}=    Set Variable    C:\\Users\\Phong\\Downloads\\automationtesting-2025-4-27-18-48-34.csv
+*** Keywords ***
+Run TestCase
+    [Arguments]    ${PATH}    ${ROW_SKIP}
     # Log To Console    ${PATH}
-    @{LIST_OBJECTS}=    Read CSV File Test Case    ${PATH}    2
+    @{LIST_OBJECTS}=    Read CSV File Test Case    ${PATH}    ${ROW_SKIP}
     # Log To Console    ${LIST_OBJECTS}
     FOR    ${ITEM}    IN    @{LIST_OBJECTS}
         ${_STEP}=    Set Variable    ${ITEM['Step']}
@@ -24,34 +24,63 @@ Switch TestCase
         ${IS_START_WITH_CLICK_ON}=    Run Keyword And Return Status    Should Start With    ${_STEP}    Click on    ignore_case=True
         ${IS_START_WITH_SELECT}=    Run Keyword And Return Status    Should Start With    ${_STEP}    select    ignore_case=True
         ${IS_START_WITH_CHOOSE_FILE}=    Run Keyword And Return Status    Should Start With    ${_STEP}    Choose File    ignore_case=True
-        Sleep    1s
-        IF    '${_STEP}' == 'Open website'
-        ...    Open Website Bypass SSL Warning Using Capabilities in Edge    ${_DATA}
+        ${IS_START_WITH_WAIT_COMPLETE}=    Run Keyword And Return Status    Should Start With    ${_STEP}    Wait complete    ignore_case=True
+        ${IS_START_WITH_WAIT_VISIBLE}=    Run Keyword And Return Status    Should Start With    ${_STEP}    Wait visible    ignore_case=True
+        ${IS_START_WITH_WAIT_ENABLED}=    Run Keyword And Return Status    Should Start With    ${_STEP}    Wait enabled    ignore_case=True
+        Sleep    500ms
+        # Wait Until Keyword Succeeds    1min    2s    Execute JavaScript    return document.readyState == 'complete';
 
-        ...    ELSE IF    ${IS_START_WITH_ENTER}    
-        ...    Run Keywords    
-        ...        Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Enter step
-        ...    AND    Should Not Be Empty    ${_DATA}    msg=Missing DATA for Enter step
-        ...    AND    Input Text    ${_XPATH}    ${_DATA}
+        IF    '${_STEP}' == 'Open website Edge'
+            ${OPEN_STATUS}=    Open Website Bypass SSL Warning Using Capabilities in Edge2    baseurl=${_DATA}
+            Run Keyword If    not ${OPEN_STATUS}    Fail    ❌ Browser failed to open
+            Maximize Browser Window
+        
+        ELSE IF    '${_STEP}' == 'Open website Firefox'
+            ${OPEN_STATUS}=    Open Website Bypass SSL Warning Using Capabilities in Firefox    baseurl=${_DATA}
+            Run Keyword If    not ${OPEN_STATUS}    Fail    ❌ Browser failed to open
+            Maximize Browser Window
 
-        ...    ELSE IF    ${IS_START_WITH_CLICK_ON}    
-        ...    Run Keywords    
-        ...        Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Click step
-        ...    AND    Click Element    ${_XPATH}
+        ELSE IF    '${_STEP}' == 'Open newtab'
+            Run Keywords
+            ...    Execute JavaScript    window.open("${_DATA}", "_blank")
+            ...    AND    Switch Window    index=1
 
-        ...    ELSE IF    ${IS_START_WITH_SELECT}    
-        ...    Run Keywords    
-        ...        Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Select step
-        ...    AND    Should Not Be Empty    ${_DATA}    msg=Missing DATA for Select step
-        ...    AND    Select From List By Value    ${_XPATH}    ${_DATA}
+        ELSE IF    ${IS_START_WITH_ENTER}    
+            Run Keywords    
+            ...    Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Enter step
+            ...    AND    Should Not Be Empty    ${_DATA}    msg=Missing DATA for Enter step
+            ...    AND    Input Text    ${_XPATH}    ${_DATA}
 
-        ...    ELSE IF    ${IS_START_WITH_CHOOSE_FILE}    
-        ...    Run Keywords    
-        ...        Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Choose File step
-        ...    AND    Should Not Be Empty    ${_DATA}    msg=Missing DATA for Choose File step
-        ...    AND    Choose File    ${_XPATH}    ${_DATA}
+        ELSE IF    ${IS_START_WITH_CLICK_ON}    
+            Run Keywords    
+            ...    Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Click step
+            ...    AND    Click Element    ${_XPATH}
 
-        ...    ELSE    
-        ...    Log To Console    Default Case: ${_STEP} / ${_DATA}
+        ELSE IF    ${IS_START_WITH_SELECT}    
+            Run Keywords    
+            ...    Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Select step
+            ...    AND    Should Not Be Empty    ${_DATA}    msg=Missing DATA for Select step
+            ...    AND    Select From List By Value    ${_XPATH}    ${_DATA}
+
+        ELSE IF    ${IS_START_WITH_CHOOSE_FILE}    
+            Run Keywords    
+            ...    Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Choose File step
+            ...    AND    Should Not Be Empty    ${_DATA}    msg=Missing DATA for Choose File step
+            ...    AND    Choose File    ${_XPATH}    ${_DATA}
+
+        ELSE IF    ${IS_START_WITH_WAIT_COMPLETE}
+            Wait Until Keyword Succeeds    1min    10s    Execute JavaScript    return document.readyState == 'complete';
+
+        ELSE IF    ${IS_START_WITH_WAIT_VISIBLE}
+            Wait Until Element Is Visible    ${_XPATH}    timeout=1min
+        
+        ELSE IF    ${IS_START_WITH_WAIT_ENABLED}
+            Wait Until Element Is Enabled    ${_XPATH}    timeout=1min
+
+        ELSE    
+            Log To Console    Default Case: ${_STEP} / ${_DATA}
+
+        END
+    
     END
 
