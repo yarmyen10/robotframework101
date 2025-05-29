@@ -1,6 +1,8 @@
 *** Settings ***
 Library    SeleniumLibrary
 Library    Collections
+Library    String
+
 Library    ../lib/read-record.py
 Resource    kw.robot
 
@@ -26,24 +28,30 @@ Run TestCase
         ${IS_START_WITH_CHOOSE_FILE}=    Run Keyword And Return Status    Should Start With    ${_STEP}    Choose File    ignore_case=True
         ${IS_START_WITH_WAIT_COMPLETE}=    Run Keyword And Return Status    Should Start With    ${_STEP}    Wait complete    ignore_case=True
         ${IS_START_WITH_WAIT_VISIBLE}=    Run Keyword And Return Status    Should Start With    ${_STEP}    Wait visible    ignore_case=True
+        ${IS_START_WITH_WAIT_NOT_VISIBLE}=    Run Keyword And Return Status    Should Start With    ${_STEP}    Wait not visible    ignore_case=True
         ${IS_START_WITH_WAIT_ENABLED}=    Run Keyword And Return Status    Should Start With    ${_STEP}    Wait enabled    ignore_case=True
+        ${IS_START_WITH_EXTERNAL_STEP}=    Run Keyword And Return Status    Should Start With    ${_STEP}    External step    ignore_case=True
         Sleep    500ms
         # Wait Until Keyword Succeeds    1min    2s    Execute JavaScript    return document.readyState == 'complete';
 
         IF    '${_STEP}' == 'Open website Edge'
-            ${OPEN_STATUS}=    Open Website Bypass SSL Warning Using Capabilities in Edge2    baseurl=${_DATA}
+            ${OPEN_STATUS}=    Open Website Bypass SSL Warning Using Capabilities in Edge2    baseurl=${_DATA}    headless=${False}
             Run Keyword If    not ${OPEN_STATUS}    Fail    ❌ Browser failed to open
             Maximize Browser Window
         
         ELSE IF    '${_STEP}' == 'Open website Firefox'
-            ${OPEN_STATUS}=    Open Website Bypass SSL Warning Using Capabilities in Firefox    baseurl=${_DATA}
+            ${OPEN_STATUS}=    Open Website Bypass SSL Warning Using Capabilities in Firefox    baseurl=${_DATA}    headless=${False}
             Run Keyword If    not ${OPEN_STATUS}    Fail    ❌ Browser failed to open
             Maximize Browser Window
 
         ELSE IF    '${_STEP}' == 'Open newtab'
             Run Keywords
-            ...    Execute JavaScript    window.open("${_DATA}", "_blank")
+            ...    Execute JavaScript    code=window.open("${_DATA}", "_blank")
             ...    AND    Switch Window    index=1
+        
+        ELSE IF    '${_STEP}' == 'Close website'
+            Run Keywords    
+            ...    Close Browser
 
         ELSE IF    ${IS_START_WITH_ENTER}    
             Run Keywords    
@@ -69,18 +77,45 @@ Run TestCase
             ...    AND    Choose File    ${_XPATH}    ${_DATA}
 
         ELSE IF    ${IS_START_WITH_WAIT_COMPLETE}
-            Wait Until Keyword Succeeds    1min    10s    Execute JavaScript    return document.readyState == 'complete';
+            Wait For Page To Be Ready
 
         ELSE IF    ${IS_START_WITH_WAIT_VISIBLE}
-            Wait Until Element Is Visible    ${_XPATH}    timeout=1min
+            Wait Until Element Is Visible After Ready    locator=${_XPATH}
+
+        ELSE IF    ${IS_START_WITH_WAIT_NOT_VISIBLE}
+            Wait Until Element Is Not Visible After Ready    locator=${_XPATH}
         
         ELSE IF    ${IS_START_WITH_WAIT_ENABLED}
-            Wait Until Element Is Enabled    ${_XPATH}    timeout=1min
+            Wait Until Element Is Enabled After Ready    locator=${_XPATH}
 
-        ELSE    
+        ELSE IF    ${IS_START_WITH_EXTERNAL_STEP}
             Log To Console    Default Case: ${_STEP} / ${_DATA}
-
+            ${split}=    Split String    ${_DATA}    |
+            Log To Console    ${split}    # ควรได้: ['Pause Execution', 'จบแล้วจ้า !!!']
+            Run Keyword    @{split}
+        ELSE
+            Log To Console    Default Case: ${_STEP} / ${_DATA}
         END
     
     END
 
+Wait For Page To Be Ready
+    Wait Until Keyword Succeeds    1min    5s    Execute JavaScript    return document.readyState == 'complete';
+
+Wait Until Element Is Visible After Ready
+    [Arguments]    ${locator}
+    Wait For Page To Be Ready
+    Wait Until Element Is Visible    ${locator}    timeout=1min
+    # ${TEXT}=    Get Text    locator=${locator}
+    # Run Keyword If    '${TEXT}' == ''    Fail    Element is visible but has no text
+    # Log    Found text: ${TEXT}
+
+Wait Until Element Is Not Visible After Ready
+    [Arguments]    ${locator}
+    Wait For Page To Be Ready
+    Wait Until Element Is Not Visible    ${locator}    timeout=1min
+
+Wait Until Element Is Enabled After Ready
+    [Arguments]    ${locator}
+    Wait For Page To Be Ready
+    Wait Until Element Is Enabled    ${locator}    timeout=1min

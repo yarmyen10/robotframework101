@@ -6,3 +6,4 @@ robotframework >= 3.1.1
 robotframework-seleniumlibrary >= 3.3.1
 robotframework-requests >= 0.9.7
 robotframework-yamllibrary >= 0.2.8
+beautifulsoup4 >= 4.13.4
