@@ -7,11 +7,12 @@ from pathlib import Path
 
 # from tkinter import *
 # Explicit imports to satisfy Flake8
-from tkinter import Menu, Tk, Canvas, Entry, Text, Button, PhotoImage
+import tkinter as tk
+from tkinter import BOTH, END, Scrollbar, Tk, ttk, Canvas, Entry, Text, Button, PhotoImage
 
 
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"D:\.w\repositories\Test\robotframework101\projects\.main\101\build\assets\frame0")
+ASSETS_PATH = OUTPUT_PATH / Path(r"assets/frame0")
 
 
 def relative_to_assets(path: str) -> Path:
@@ -22,24 +23,6 @@ window = Tk()
 
 window.geometry("640x480")
 window.configure(bg = "#01A7A8")
-
-menu_bar = Menu(window)
-
-# สร้างเมนูย่อย
-setting_menu = Menu(menu_bar, tearoff=0)
-setting_menu.add_command(
-    label="Configuration",
-    command=lambda: print("Configuration clicked")
-)
-
-# เอาเมนูย่อยไปใส่ใน Menu หลัก
-menu_bar.add_cascade(
-    label="Settings",
-    menu=setting_menu
-)
-
-# ผูก Menu หลักเข้ากับ Window
-window.config(menu=menu_bar)
 
 canvas = Canvas(
     window,
@@ -56,7 +39,7 @@ entry_image_1 = PhotoImage(
     file=relative_to_assets("entry_1.png"))
 entry_bg_1 = canvas.create_image(
     290.0,
-    98.5,
+    74.5,
     image=entry_image_1
 )
 entry_1 = Entry(
@@ -67,30 +50,46 @@ entry_1 = Entry(
 )
 entry_1.place(
     x=100.0,
-    y=86.0,
+    y=62.0,
     width=380.0,
     height=23.0
 )
 
 canvas.create_rectangle(
     500.0,
-    91.0,
+    67.0,
     600.0,
-    111.0,
+    87.0,
+    fill="#000000",
+    outline="")
+
+canvas.create_rectangle(
+    500.0,
+    107.0,
+    600.0,
+    127.0,
     fill="#000000",
     outline="")
 
 canvas.create_rectangle(
     495.0,
-    86.0,
+    62.0,
     595.0,
-    106.0,
+    82.0,
+    fill="#FFFFFF",
+    outline="")
+
+canvas.create_rectangle(
+    495.0,
+    102.0,
+    595.0,
+    122.0,
     fill="#FFFFFF",
     outline="")
 
 canvas.create_text(
     523.0,
-    89.0,
+    65.0,
     anchor="nw",
     text="Browse",
     fill="#000000",
@@ -98,8 +97,17 @@ canvas.create_text(
 )
 
 canvas.create_text(
+    533.0,
+    105.0,
+    anchor="nw",
+    text="Add",
+    fill="#000000",
+    font=("Inter", 12 * -1)
+)
+
+canvas.create_text(
     55.0,
-    89.0,
+    65.0,
     anchor="nw",
     text="Path:",
     fill="#000000",
@@ -130,6 +138,31 @@ canvas.create_rectangle(
     170.0,
     fill="#FFFFFF",
     outline="")
+
+canvas.create_rectangle(
+    26.0,
+    185.0,
+    26.0,
+    450.0,
+    fill="#FFFFFF",
+    outline="")
+
+canvas.create_rectangle(
+    615.0,
+    185.0,
+    615.0,
+    450.0,
+    fill="#FFFFFF",
+    outline="")
+
+canvas.create_text(
+    45.0,
+    178.0,
+    anchor="nw",
+    text="List",
+    fill="#000000",
+    font=("Inter", 12 * -1)
+)
 
 canvas.create_rectangle(
     15.0,
@@ -197,6 +230,30 @@ canvas.create_rectangle(
     outline="")
 
 canvas.create_rectangle(
+    71.0,
+    184.9999999999999,
+    615.0,
+    185.0,
+    fill="#FFFFFF",
+    outline="")
+
+canvas.create_rectangle(
+    26.0,
+    185.0,
+    40.0,
+    185.00000122391884,
+    fill="#FFFFFF",
+    outline="")
+
+canvas.create_rectangle(
+    26.0,
+    450.0,
+    615.0,
+    450.0000514920154,
+    fill="#FFFFFF",
+    outline="")
+
+canvas.create_rectangle(
     15.0,
     465.0,
     625.0,
@@ -259,5 +316,73 @@ canvas.create_rectangle(
     10.0,
     fill="#FFFFFF",
     outline="")
+
+# canvas.create_rectangle(
+#     31.0,
+#     207.0,
+#     610.0,
+#     445.0,
+#     fill="#D9D9D9",
+#     outline="")
+
+# ========== สร้าง Style ========== #
+style = ttk.Style()
+
+# กำหนด Theme (ใช้ 'default' หรือ 'clam' จะ Custom ได้มาก)
+style.theme_use("clam")
+
+# แต่งหัว Column (Heading)
+style.configure("Treeview.Heading",
+    background="#149cb6",
+    foreground="white",
+    font=('Arial', 10, 'bold'),
+)
+
+# แต่ง Row (Body)
+style.configure("Treeview",
+    background="white",
+    foreground="black",
+    fieldbackground="white",  # พื้นหลังช่องว่างๆ
+    font=('Arial', 12, 'normal'),
+)
+
+# แต่ง Selection (เวลาคลิกเลือก)
+# style.map('Treeview',
+#     background=[('selected', '#3399FF')],
+#     foreground=[('selected', 'white')]
+# )
+
+# สร้าง Treeview
+tree = ttk.Treeview(window, columns=("No", "File Name", "Age", "City"), show="headings")
+tree.pack(fill=BOTH, expand=True)
+
+# ตั้งชื่อหัว column
+tree.heading("No", text="No.")
+tree.heading("File Name", text="File Name")
+tree.heading("Age", text="อายุ")
+tree.heading("City", text="เมือง")
+
+# กำหนดความกว้างของ column
+tree.column("No", width=50, stretch=True)
+tree.column("File Name", width=300, stretch=True)
+tree.column("Age", width=200)
+tree.column("City", width=200)
+
+# ลองเพิ่มข้อมูล
+data = [(1, "สมชาย", 30, "กรุงเทพ"), (2, "สมหญิง", 25, "เชียงใหม่"), (3, "เอกชัย", 28, "ขอนแก่น"), (4, "นางสาว", 22, "ภูเก็ต")]
+for item in data:
+    tree.insert("", END, values=item)
+
+tree.place(x=28, y=200, width=586, height=230)
+
+# สร้าง Scrollbar แนวนอน
+scroll_x = Scrollbar(window, orient='horizontal', command=tree.xview)
+
+# ผูก Scrollbar กับ Treeview
+tree.configure(xscrollcommand=scroll_x.set)
+
+# วาง Scrollbar ด้านล่าง Treeview
+scroll_x.place(x=29, y=181 + 249, width=584)
+
 window.resizable(False, False)
 window.mainloop()
