@@ -60,8 +60,7 @@ Open Website Bypass SSL Warning Using Capabilities in Edge2
         ...    --disable-breakpad
         ...    --disable-crash-reporter
         ...    --disable-domain-reliability
-        
-        Call Method    ${BROWSER_OPTIONS}    add_argument    ${arg}    
+        Call Method    ${BROWSER_OPTIONS}    add_argument    ${arg}
     END
     IF    ${headless}
         Call Method    ${BROWSER_OPTIONS}    add_argument    --headless
@@ -76,14 +75,14 @@ Open Website Bypass SSL Warning Using Capabilities in Firefox
     ${BROWSER_OPTIONS}=    Evaluate    sys.modules['selenium.webdriver'].FirefoxOptions()    sys, selenium.webdriver
     FOR    ${arg}    IN
         ...    --disable-renderer-backgrounding
-        ...    --no-sandbox
-        ...    --disable-dev-shm-usage
+        # ...    --no-sandbox
+        # ...    --disable-dev-shm-usage
         ...    --disable-extensions
         ...    --disable-infobars
         ...    --ignore-certificate-errors
         ...    --allow-insecure-localhost
         ...    --insecure
-        ...    --disable-gpu
+        # ...    --disable-gpu
         ...    --guest
         ...    --no-first-run
         ...    --disable-popup-blocking
@@ -111,7 +110,7 @@ Open Website Bypass SSL Warning Using Capabilities in Firefox
         ...    --disable-breakpad
         ...    --disable-crash-reporter
         ...    --disable-domain-reliability
-        Call Method    ${BROWSER_OPTIONS}    add_argument    ${arg}    
+        Call Method    ${BROWSER_OPTIONS}    add_argument    ${arg}
     END
     IF    ${headless}
         Call Method    ${BROWSER_OPTIONS}    add_argument    --headless

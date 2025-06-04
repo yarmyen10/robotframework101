@@ -1,7 +1,7 @@
     , OS: Windows 11 | Browser: Microsoft Edge 122 | Resolution: 1920x1032 | Time: 13 May 2025 / 13:30:11  GMT+7
 
 "#" , "Step"                                                                                                    , "Data"                                     , "Exp Result", "XPath"                                               , "cssSelector"
-"1" , "Open website Firefox"                                                                                    , "https://uitestingplayground.com/sampleapp", ""          , ""                                                    , ""
+"1" , "Open website Edge"                                                                                    , "https://uitestingplayground.com/sampleapp", ""          , ""                                                    , ""
 "2" , "Enter ""test"" into ""User Name"""                                                                       , "test"                                     , ""          , "//input[@name='UserName']"                           , "#d82ab153-93b3-312b-4801-44a400ac41c0"
 "3" , "Enter ""******"" into ""********"""                                                                      , "pwd"                                      , ""          , "//input[@name='Password']"                           , "input[id='2c1f810c-bc63-cbde-0f65-337a53d03f41']"
 "4" , "Click on ""Log Out"""                                                                                    , ""                                         , ""          , "//button[@id='login']"                               , "#login"
