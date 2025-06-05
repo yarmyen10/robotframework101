@@ -12,7 +12,7 @@ from pathlib import Path
 PATH = Path(__file__).parent / 'assets'
 
 
-class RobotV1(ttk.Frame):
+class RoboBuddy(ttk.Frame):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -393,5 +393,5 @@ class CollapsingFrame(ttk.Frame):
 if __name__ == '__main__':
 
     app = ttk.Window("Robot V1")
-    RobotV1(app)
+    RoboBuddy(app)
     app.mainloop()
