@@ -7,6 +7,7 @@ from ttkbootstrap.dialogs import Messagebox
 from ttkbootstrap.constants import *
 from tkinter.scrolledtext import ScrolledText
 from pathlib import Path
+from tkinter import Toplevel
 
 
 PATH = Path(__file__).parent / 'assets'
@@ -43,21 +44,21 @@ class RoboBuddy(ttk.Frame):
         buttonbar = ttk.Frame(self, style='primary.TFrame')
         buttonbar.pack(fill=X, pady=1, side=TOP)
 
-        ## new robot
-        _func = lambda: Messagebox.ok(message='Adding new robot')
+        ## new robo
+        #_func = lambda: Messagebox.ok(message='Adding new robo')
         btn = ttk.Button(
-            master=buttonbar, text='New robot set',
+            master=buttonbar, text='New robo set',
             image='add-to-backup-light',
             compound=LEFT,
-            command=_func
+            command=self.new_robo_modal
         )
         btn.pack(side=LEFT, ipadx=5, ipady=5, padx=(1, 0), pady=1)
 
-        ## Robot
-        _func = lambda: Messagebox.ok(message='Robot up...')
+        ## Robo
+        _func = lambda: Messagebox.ok(message='Play robo...')
         btn = ttk.Button(
             master=buttonbar,
-            text='Robot',
+            text='Robo',
             image='play',
             compound=LEFT,
             command=_func
@@ -76,7 +77,7 @@ class RoboBuddy(ttk.Frame):
         btn.pack(side=LEFT, ipadx=5, ipady=5, padx=0, pady=1)
 
         ## stop
-        _func = lambda: Messagebox.ok(message='Stopping robot.')
+        _func = lambda: Messagebox.ok(message='Stopping robo.')
         btn = ttk.Button(
             master=buttonbar,
             text='Stop',
@@ -110,7 +111,7 @@ class RoboBuddy(ttk.Frame):
         bus_frm.columnconfigure(1, weight=1)
         bus_cf.add(
             child=bus_frm,
-            title='Robot Summary',
+            title='Robo Summary',
             bootstyle=SECONDARY)
 
         ## destination
@@ -151,10 +152,10 @@ class RoboBuddy(ttk.Frame):
         bus_prop_btn.grid(row=4, column=0, columnspan=2, sticky=W)
 
         ## add to backup button
-        _func = lambda: Messagebox.ok(message='Adding to robot')
+        _func = lambda: Messagebox.ok(message='Adding to robo')
         add_btn = ttk.Button(
             master=bus_frm,
-            text='Add to robot',
+            text='Add to robo',
             image='add-to-backup-dark',
             compound=LEFT,
             command=_func,
@@ -171,7 +172,7 @@ class RoboBuddy(ttk.Frame):
         status_frm.columnconfigure(1, weight=1)
         status_cf.add(
             child=status_frm,
-            title='Robot Status',
+            title='Robo Status',
             bootstyle=SECONDARY
         )
         ## progress message
@@ -181,7 +182,7 @@ class RoboBuddy(ttk.Frame):
             font='Helvetica 10 bold'
         )
         lbl.grid(row=0, column=0, columnspan=2, sticky=W)
-        self.setvar('prog-message', 'Running Robot Script...')
+        self.setvar('prog-message', 'Running Robo Script...')
 
         ## progress bar
         pb = ttk.Progressbar(
@@ -212,7 +213,7 @@ class RoboBuddy(ttk.Frame):
         sep.grid(row=5, column=0, columnspan=2, pady=10, sticky=EW)
 
         ## stop button
-        _func = lambda: Messagebox.ok(message='Stopping robot')
+        _func = lambda: Messagebox.ok(message='Stopping robo')
         btn = ttk.Button(
             master=status_frm,
             text='Stop',
@@ -276,7 +277,7 @@ class RoboBuddy(ttk.Frame):
         scroll_cf.pack(fill=BOTH, expand=YES)
 
         output_container = ttk.Frame(scroll_cf, padding=1)
-        _value = 'Log: Running Robot Script... [Uploading file: D:/sample_file_35.txt]'
+        _value = 'Log: Running Robo Script... [Uploading file: D:/sample_file_35.txt]'
         self.setvar('scroll-message', _value)
         st = ScrolledText(output_container)
         st.pack(fill=BOTH, expand=YES)
@@ -307,6 +308,25 @@ class RoboBuddy(ttk.Frame):
         print(f'Selected directory: {d}')
         if d:
             self.setvar('folder-path', d)
+
+    def new_robo_modal(self):
+        # ขนาด modal
+        modal_width = 400
+        modal_height = 300
+
+        # คำนวณตำแหน่งให้อยู่กลาง
+        x = self.winfo_x() + (self.winfo_width() // 2) - (modal_width // 2)
+        y = self.winfo_y() + (self.winfo_height() // 2) - (modal_height // 2)
+
+        # เปิด Toplevel (Modal)
+        modal = Toplevel(self)
+        modal.title("New robo set")
+        modal.geometry(f"{modal_width}x{modal_height}+{x}+{y}")
+        modal.transient(self)
+        modal.grab_set()
+
+        ttk.Label(modal, text="This is a centered modal window!").pack(pady=20)
+        ttk.Button(modal, text="Close", command=modal.destroy, bootstyle="danger").pack(pady=10)
 
 
 class CollapsingFrame(ttk.Frame):
