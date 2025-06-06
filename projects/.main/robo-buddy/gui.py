@@ -43,21 +43,21 @@ class RoboBuddy(ttk.Frame):
         buttonbar = ttk.Frame(self, style='primary.TFrame')
         buttonbar.pack(fill=X, pady=1, side=TOP)
 
-        ## new backup
-        _func = lambda: Messagebox.ok(message='Adding new backup')
+        ## new robot
+        _func = lambda: Messagebox.ok(message='Adding new robot')
         btn = ttk.Button(
-            master=buttonbar, text='New backup set',
+            master=buttonbar, text='New robot set',
             image='add-to-backup-light',
             compound=LEFT,
             command=_func
         )
         btn.pack(side=LEFT, ipadx=5, ipady=5, padx=(1, 0), pady=1)
 
-        ## backup
-        _func = lambda: Messagebox.ok(message='Backing up...')
+        ## Robot
+        _func = lambda: Messagebox.ok(message='Robot up...')
         btn = ttk.Button(
             master=buttonbar,
-            text='Backup',
+            text='Robot',
             image='play',
             compound=LEFT,
             command=_func
@@ -76,7 +76,7 @@ class RoboBuddy(ttk.Frame):
         btn.pack(side=LEFT, ipadx=5, ipady=5, padx=0, pady=1)
 
         ## stop
-        _func = lambda: Messagebox.ok(message='Stopping backup.')
+        _func = lambda: Messagebox.ok(message='Stopping robot.')
         btn = ttk.Button(
             master=buttonbar,
             text='Stop',
@@ -110,7 +110,7 @@ class RoboBuddy(ttk.Frame):
         bus_frm.columnconfigure(1, weight=1)
         bus_cf.add(
             child=bus_frm,
-            title='Backup Summary',
+            title='Robot Summary',
             bootstyle=SECONDARY)
 
         ## destination
@@ -151,10 +151,10 @@ class RoboBuddy(ttk.Frame):
         bus_prop_btn.grid(row=4, column=0, columnspan=2, sticky=W)
 
         ## add to backup button
-        _func = lambda: Messagebox.ok(message='Adding to backup')
+        _func = lambda: Messagebox.ok(message='Adding to robot')
         add_btn = ttk.Button(
             master=bus_frm,
-            text='Add to backup',
+            text='Add to robot',
             image='add-to-backup-dark',
             compound=LEFT,
             command=_func,
@@ -171,7 +171,7 @@ class RoboBuddy(ttk.Frame):
         status_frm.columnconfigure(1, weight=1)
         status_cf.add(
             child=status_frm,
-            title='Backup Status',
+            title='Robot Status',
             bootstyle=SECONDARY
         )
         ## progress message
@@ -181,7 +181,7 @@ class RoboBuddy(ttk.Frame):
             font='Helvetica 10 bold'
         )
         lbl.grid(row=0, column=0, columnspan=2, sticky=W)
-        self.setvar('prog-message', 'Backing up...')
+        self.setvar('prog-message', 'Running Robot Script...')
 
         ## progress bar
         pb = ttk.Progressbar(
@@ -212,7 +212,7 @@ class RoboBuddy(ttk.Frame):
         sep.grid(row=5, column=0, columnspan=2, pady=10, sticky=EW)
 
         ## stop button
-        _func = lambda: Messagebox.ok(message='Stopping backup')
+        _func = lambda: Messagebox.ok(message='Stopping robot')
         btn = ttk.Button(
             master=status_frm,
             text='Stop',
@@ -276,7 +276,7 @@ class RoboBuddy(ttk.Frame):
         scroll_cf.pack(fill=BOTH, expand=YES)
 
         output_container = ttk.Frame(scroll_cf, padding=1)
-        _value = 'Log: Backing up... [Uploading file: D:/sample_file_35.txt]'
+        _value = 'Log: Running Robot Script... [Uploading file: D:/sample_file_35.txt]'
         self.setvar('scroll-message', _value)
         st = ScrolledText(output_container)
         st.pack(fill=BOTH, expand=YES)
@@ -304,6 +304,7 @@ class RoboBuddy(ttk.Frame):
         """Open dialogue to get directory and update variable"""
         self.update_idletasks()
         d = askdirectory()
+        print(f'Selected directory: {d}')
         if d:
             self.setvar('folder-path', d)
 
@@ -392,6 +393,6 @@ class CollapsingFrame(ttk.Frame):
 
 if __name__ == '__main__':
 
-    app = ttk.Window("Robot V1")
+    app = ttk.Window("Robo Buddy")
     RoboBuddy(app)
     app.mainloop()
