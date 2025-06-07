@@ -1,6 +1,6 @@
 *** Settings ***
 Library    Dialogs
-Resource    ../resource/prove-step.robot
+Resource    ../resource/prove-step.resource
 
 *** Test Cases ***
 Test Vendor Master

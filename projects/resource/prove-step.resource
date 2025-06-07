@@ -3,8 +3,8 @@ Library    SeleniumLibrary
 Library    Collections
 Library    String
 
-Library    ../lib/read-record.py
-Resource    kw.robot
+Library    ../lib/ReadRecord.py
+Resource    kw.resource
 
 *** Variables ***
 @{LIST_OBJECTS}    ${EMPTY}

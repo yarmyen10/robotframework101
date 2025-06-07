@@ -325,8 +325,25 @@ class RoboBuddy(ttk.Frame):
         modal.transient(self)
         modal.grab_set()
 
-        ttk.Label(modal, text="This is a centered modal window!").pack(pady=20)
-        ttk.Button(modal, text="Close", command=modal.destroy, bootstyle="danger").pack(pady=10)
+        modal_container = ttk.Frame(modal, padding=10)
+        modal_container.pack(side=TOP, fill=BOTH, expand=True)
+
+        # Entry
+        new_file_case = ttk.Entry(modal_container, textvariable='folder-path')
+        new_file_case.pack(side=LEFT, fill=X, expand=True, padx=(0, 0), pady=5)
+        self.setvar('folder-path', 'D:/text/myfiles/top-secret/samples/')
+
+        # Button
+        btn = ttk.Button(
+            master=modal_container,
+            image='opened-folder',
+            bootstyle=(LINK, SECONDARY),
+            command=self.get_directory
+        )
+        btn.pack(side=RIGHT)
+
+        # ttk.Label(modal, text="This is a centered modal window!").pack(pady=20)
+        # ttk.Button(modal, text="Close", command=modal.destroy, bootstyle="danger").pack(pady=10)
 
 
 class CollapsingFrame(ttk.Frame):

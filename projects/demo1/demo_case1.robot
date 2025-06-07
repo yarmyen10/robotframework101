@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ../resource/prove-step.robot
+Resource    ../resource/prove-step.resource
 
 *** Test Cases ***
 Test Demo1 Case1
