@@ -58,23 +58,27 @@ Run TestCase
             Run Keywords
             ...    Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Enter step
             ...    AND    Should Not Be Empty    ${_DATA}    msg=Missing DATA for Enter step
+            ...    AND    Wait Until Element Is Enabled After Ready    locator=${_XPATH}
             ...    AND    Input Text    ${_XPATH}    ${_DATA}
 
         ELSE IF    ${IS_START_WITH_CLICK_ON}
             Run Keywords
             ...    Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Click step
+            ...    AND    Wait Until Element Is Enabled After Ready    locator=${_XPATH}
             ...    AND    Click Element    ${_XPATH}
 
         ELSE IF    ${IS_START_WITH_SELECT}
             Run Keywords
             ...    Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Select step
             ...    AND    Should Not Be Empty    ${_DATA}    msg=Missing DATA for Select step
+            ...    AND    Wait Until Element Is Enabled After Ready    locator=${_XPATH}
             ...    AND    Select From List By Value    ${_XPATH}    ${_DATA}
 
         ELSE IF    ${IS_START_WITH_CHOOSE_FILE}
             Run Keywords
             ...    Should Not Be Empty    ${_XPATH}    msg=Missing XPATH for Choose File step
             ...    AND    Should Not Be Empty    ${_DATA}    msg=Missing DATA for Choose File step
+            ...    AND    Wait Until Element Is Enabled After Ready    locator=${_XPATH}
             ...    AND    Choose File    ${_XPATH}    ${_DATA}
 
         ELSE IF    ${IS_START_WITH_WAIT_COMPLETE}

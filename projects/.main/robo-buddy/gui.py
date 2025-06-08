@@ -2,12 +2,13 @@ from datetime import datetime
 from random import choices
 import ttkbootstrap as ttk
 from ttkbootstrap.style import Bootstyle
-from tkinter.filedialog import askdirectory
+from tkinter.filedialog import askdirectory, askopenfilename
 from ttkbootstrap.dialogs import Messagebox
 from ttkbootstrap.constants import *
 from tkinter.scrolledtext import ScrolledText
 from pathlib import Path
 from tkinter import Toplevel
+import logic
 
 
 PATH = Path(__file__).parent / 'assets'
@@ -17,15 +18,17 @@ class RoboBuddy(ttk.Frame):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.robo_logic = logic.RoboBuddyLogic(self)
         self.pack(fill=BOTH, expand=YES)
 
         image_files = {
             'properties-dark': 'icons8_settings_24px.png',
             'properties-light': 'icons8_settings_24px_2.png',
-            'add-to-backup-dark': 'icons8_add_folder_24px.png',
-            'add-to-backup-light': 'icons8_add_book_24px.png',
-            'stop-backup-dark': 'icons8_cancel_24px.png',
-            'stop-backup-light': 'icons8_cancel_24px_1.png',
+            'add-to-robo-dark': 'icons8_add_folder_24px.png',
+            # 'add-to-robo-dark': 'icons8_add_book_dark_24px.png',
+            'add-to-robo-light': 'icons8_add_book_24px.png',
+            'stop-robo-dark': 'icons8_cancel_24px.png',
+            'stop-robo-light': 'icons8_cancel_24px_1.png',
             'play': 'icons8_play_24px_1.png',
             'refresh': 'icons8_refresh_24px_1.png',
             'stop-dark': 'icons8_stop_24px.png',
@@ -48,7 +51,7 @@ class RoboBuddy(ttk.Frame):
         #_func = lambda: Messagebox.ok(message='Adding new robo')
         btn = ttk.Button(
             master=buttonbar, text='New robo set',
-            image='add-to-backup-light',
+            image='add-to-robo-light',
             compound=LEFT,
             command=self.new_robo_modal
         )
@@ -156,7 +159,7 @@ class RoboBuddy(ttk.Frame):
         add_btn = ttk.Button(
             master=bus_frm,
             text='Add to robo',
-            image='add-to-backup-dark',
+            image='add-to-robo-dark',
             compound=LEFT,
             command=_func,
             bootstyle=LINK
@@ -217,7 +220,7 @@ class RoboBuddy(ttk.Frame):
         btn = ttk.Button(
             master=status_frm,
             text='Stop',
-            image='stop-backup-dark',
+            image='stop-robo-dark',
             compound=LEFT,
             command=_func,
             bootstyle=LINK
@@ -286,7 +289,7 @@ class RoboBuddy(ttk.Frame):
         # seed with some sample data
 
         ## starting sample directory
-        file_entry.insert(END, 'D:/text/myfiles/top-secret/samples/')
+        file_entry.insert(END, self.robo_logic.working_directory)
 
         ## treeview and backup logs
         for x in range(20, 35):
@@ -307,11 +310,26 @@ class RoboBuddy(ttk.Frame):
         d = askdirectory()
         print(f'Selected directory: {d}')
         if d:
+            self.robo_logic.set_directory(d)
             self.setvar('folder-path', d)
+
+    def get_file_robo(self):
+        """Open dialogue to get file and update variable"""
+        self.update_idletasks()
+        f = askopenfilename(
+            title="เลือกไฟล์",
+            filetypes=[
+                ("CSV Files", "*.csv"),
+                ("Excel Files", "*.xlsx *.xls")
+            ]
+        )
+        print(f'Selected file: {f}')
+        if f:
+            self.setvar('file-path', f)
 
     def new_robo_modal(self):
         # ขนาด modal
-        modal_width = 400
+        modal_width = 600
         modal_height = 300
 
         # คำนวณตำแหน่งให้อยู่กลาง
@@ -328,23 +346,26 @@ class RoboBuddy(ttk.Frame):
         modal_container = ttk.Frame(modal, padding=10)
         modal_container.pack(side=TOP, fill=BOTH, expand=True)
 
+        top_frame = ttk.Frame(modal_container)
+        top_frame.pack(side=TOP, fill=X, pady=(0, 10))
+
         # Entry
-        new_file_case = ttk.Entry(modal_container, textvariable='folder-path')
+        new_file_case = ttk.Entry(top_frame, textvariable='file-path')
         new_file_case.pack(side=LEFT, fill=X, expand=True, padx=(0, 0), pady=5)
-        self.setvar('folder-path', 'D:/text/myfiles/top-secret/samples/')
+        self.setvar('file-path', 'D:/text/myfiles/top-secret/samples/')
+
+        bottom_frame = ttk.Frame(modal_container)
+        bottom_frame.pack(side=BOTTOM, fill=X, pady=(0, 10))
+        ttk.Button(bottom_frame, text="Close", command=modal.destroy, bootstyle="danger").pack(side=RIGHT, pady=10)
 
         # Button
         btn = ttk.Button(
-            master=modal_container,
-            image='opened-folder',
+            master=top_frame,
+            image='add-to-robo-dark',
             bootstyle=(LINK, SECONDARY),
-            command=self.get_directory
+            command=self.get_file_robo
         )
         btn.pack(side=RIGHT)
-
-        # ttk.Label(modal, text="This is a centered modal window!").pack(pady=20)
-        # ttk.Button(modal, text="Close", command=modal.destroy, bootstyle="danger").pack(pady=10)
-
 
 class CollapsingFrame(ttk.Frame):
     """A collapsible frame widget that opens and closes with a click."""
