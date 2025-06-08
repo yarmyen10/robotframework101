@@ -24,8 +24,8 @@ class RoboBuddy(ttk.Frame):
         image_files = {
             'properties-dark': 'icons8_settings_24px.png',
             'properties-light': 'icons8_settings_24px_2.png',
-            'add-to-robo-dark': 'icons8_add_folder_24px.png',
-            # 'add-to-robo-dark': 'icons8_add_book_dark_24px.png',
+            # 'add-to-robo-dark': 'icons8_add_folder_24px.png',
+            'add-to-robo-dark': 'add-robo-dark.png',
             'add-to-robo-light': 'icons8_add_book_24px.png',
             'stop-robo-dark': 'icons8_cancel_24px.png',
             'stop-robo-light': 'icons8_cancel_24px_1.png',
