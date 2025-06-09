@@ -1,5 +1,6 @@
 from datetime import datetime
 from random import choices
+from functools import partial
 import ttkbootstrap as ttk
 from ttkbootstrap.style import Bootstyle
 from tkinter.filedialog import askdirectory, askopenfilename
@@ -8,6 +9,7 @@ from ttkbootstrap.constants import *
 from tkinter.scrolledtext import ScrolledText
 from pathlib import Path
 from tkinter import Toplevel
+import tkinter.font as tkFont
 import logic
 
 
@@ -34,7 +36,9 @@ class RoboBuddy(ttk.Frame):
             'stop-dark': 'icons8_stop_24px.png',
             'stop-light': 'icons8_stop_24px_1.png',
             'opened-folder': 'icons8_opened_folder_24px.png',
-            'logo': 'Robot-framework-logo.png'
+            'logo': 'Robot-framework-logo.png',
+            'edge_icon': 'microsoft.png',
+            'firefox_icon': 'firefox.png',
         }
 
         self.photoimages = []
@@ -58,13 +62,13 @@ class RoboBuddy(ttk.Frame):
         btn.pack(side=LEFT, ipadx=5, ipady=5, padx=(1, 0), pady=1)
 
         ## Robo
-        _func = lambda: Messagebox.ok(message='Play robo...')
+        # _func = lambda: Messagebox.ok(message='Play robo...')
         btn = ttk.Button(
             master=buttonbar,
             text='Robo',
             image='play',
             compound=LEFT,
-            command=_func
+            command=self.play_robo
         )
         btn.pack(side=LEFT, ipadx=5, ipady=5, padx=0, pady=1)
 
@@ -274,6 +278,8 @@ class RoboBuddy(ttk.Frame):
             tv.heading(col, text=col.title(), anchor=W)
 
         tv.pack(fill=X, pady=1)
+        tv.bind('<<TreeviewSelect>>', partial(self.on_tree_select, tv=tv))
+        tv.bind("<Double-1>", self.on_treeview_double_click)
 
         ## scrolling text output
         scroll_cf = CollapsingFrame(right_panel)
@@ -291,19 +297,61 @@ class RoboBuddy(ttk.Frame):
         ## starting sample directory
         file_entry.insert(END, self.robo_logic.working_directory)
 
-        self.robo_logic.get_case_list('cases')
+        files_case = self.robo_logic.get_case_list('cases', ('.csv', '.json'))
         ## treeview and backup logs
-        for x in range(20, 35):
-            result = choices(['Backup Up', 'Missed in Destination'])[0]
-            # st.insert(END, f'19:34:{x}\t\t Uploading: D:/file_{x}.txt\n')
-            # st.insert(END, f'19:34:{x}\t\t Upload {result}.\n')
-            timestamp = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
-            tv.insert('', END, x,
-                      values=(f'sample_file_{x}.txt',
-                              result, timestamp, timestamp,
-                              f'{int(x // 3)} MB')
-            )
-        tv.selection_set(20)
+        if files_case:
+            for filename, size in files_case:
+                size_type = 'MB'
+                if (self.bytes_to_mb(size) < 0.1):
+                    size_type = 'Bytes'
+                else:
+                    size = self.bytes_to_mb(size)
+
+                item_id = tv.insert('', END, filename,
+                    values=(filename, 'Ready',
+                            datetime.now().strftime('%d.%m.%Y %H:%M:%S'),
+                            datetime.now().strftime('%d.%m.%Y %H:%M:%S'),
+                            f'{size} {size_type}')
+                )
+            if len(files_case) > 0:
+                items = tv.get_children()
+                if items:
+                    tv.selection_set(items[0])
+                    tv.focus(items[0])
+                    tv.see(items[0])
+
+            self.autofit_columns(tv)
+
+    def bytes_to_mb(self, num_bytes):
+        return round(int(num_bytes) / (1024 * 1024), 2)
+
+    def autofit_columns(self, treeview):
+        font = tkFont.Font()
+        for col in treeview['columns']:
+            max_width = font.measure(col)
+            for item in treeview.get_children():
+                cell_value = str(treeview.set(item, col))
+                cell_width = font.measure(cell_value)
+                if cell_width > max_width:
+                    max_width = cell_width
+            # เพิ่ม padding เล็กน้อย
+            treeview.column(col, width=max_width + 20)
+
+    def on_tree_select(self, event, tv=None):
+        selected_item = tv.selection()  # คืนค่า tuple ของ item id ที่เลือก
+        if selected_item:
+            item = selected_item[0]  # เอา item ตัวแรก
+            values = tv.item(item, 'values')  # ดึงข้อมูลในแถวนั้น
+            self.setvar('selected-file', values)  # เก็บชื่อไฟล์ในตัวแปร
+            print(f"Selected Filename: {values[0]}, Size: {values[1]}")
+
+    def on_treeview_double_click(self, event):
+        tree = event.widget
+        item_id = tree.identify_row(event.y)
+        if item_id:
+            values = tree.item(item_id, "values")
+            # แสดง Messagebox พร้อมข้อมูลในแถว
+            Messagebox.ok(message=f"ข้อมูลแถว:\n{values}")
 
     def get_directory(self):
         """Open dialogue to get directory and update variable"""
@@ -368,6 +416,80 @@ class RoboBuddy(ttk.Frame):
         )
         btn.pack(side=RIGHT)
 
+    def play_robo(self):
+        # Messagebox.yesno(message='Starting Robo Script...')
+        modal_width = 600
+        modal_height = 300
+
+        x = self.winfo_x() + (self.winfo_width() // 2) - (modal_width // 2)
+        y = self.winfo_y() + (self.winfo_height() // 2) - (modal_height // 2)
+
+        modal = Toplevel()
+        modal.title("Play Robo")
+        modal.geometry(f"{modal_width}x{modal_height}+{x}+{y}")
+        modal.transient(self)
+        modal.grab_set()
+
+        modal_container = ttk.Frame(modal, padding=10)
+        modal_container.pack(side=TOP, fill=BOTH, expand=True)
+
+        top_frame = ttk.Frame(modal_container)
+        top_frame.pack(side=TOP, fill=X, pady=(0, 10))
+
+        lbl = ttk.Label(top_frame, text="This is a custom label")
+        lbl.pack(pady=10)
+        browser_var = ttk.StringVar()
+        ttk.Radiobutton(
+            top_frame,
+            text="Microsoft Edge",
+            image='edge_icon',
+            compound="left",    # icon อยู่ซ้ายข้อความ
+            variable=browser_var,
+            value="Edge"
+        ).pack(side=LEFT, padx=15, pady=10, anchor="w")
+
+        ttk.Radiobutton(
+            top_frame,
+            text="Firefox",
+            image='firefox_icon',
+            compound="left",    # icon อยู่ซ้ายข้อความ
+            variable=browser_var,
+            value="Firefox"
+        ).pack(side=LEFT, padx=15, pady=10, anchor="w")
+
+        # --- ใส่ Separator เส้นคั่น ---
+        separator = ttk.Separator(modal, orient='horizontal')
+        separator.pack(fill=X)  # เว้นระยะนิดนึง
+
+        container = ttk.Frame(modal, padding=10)
+        container.pack(fill=X)
+
+        self.buttons = []
+        self.buttons.append(
+            ttk.Button(
+                master=container,
+                text="Cancel",
+                width=10,
+                bootstyle=DANGER,
+                command=modal.destroy,
+            )
+        )
+        self.buttons.append(
+            ttk.Button(
+                master=container,
+                text="Play Robo",
+                width=10,
+                bootstyle=SUCCESS,
+                command=modal.destroy,
+            )
+        )
+        for button in self.buttons:
+            button.pack(side=RIGHT, fill=X, padx=5, pady=5)
+
+        # btn = ttk.Button(modal, text="OK", command=modal.destroy)
+        # btn.pack(side=BOTTOM, padx=30, pady=10)
+
+        modal.grab_set()  # ทำให้ popup เป็น modal
 class CollapsingFrame(ttk.Frame):
     """A collapsible frame widget that opens and closes with a click."""
 

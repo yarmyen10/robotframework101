@@ -60,7 +60,7 @@ class RoboBuddyLogic:
         self.set_default_folder_basic(robo_buddy_folder)
 
         return ini_path
-    
+
     def set_default_folder_basic(self, working_directory: str):
         robo_buddy_folder_basic = os.path.join(working_directory, "cases")
 
@@ -140,24 +140,24 @@ class RoboBuddyLogic:
     def check_ini_file(self, ini_path):
         return os.path.exists(ini_path)
 
-    def get_case_list(self, folder_name: str) -> list:
+    def get_case_list(self, folder_name: str, tyepe_filter: list) -> list:
         print(f"กำลังดึงรายการเคสทดสอบ... {self.working_directory}")
         if not self.check_ini_file(self.ini_path):
             print(f"ไม่พบไฟล์ ini ที่ {self.ini_path}")
             return []
         else:
-            files_case = self.list_files_in_folder(os.path.join(self.working_directory, folder_name))
+            files_case = self.list_files_in_folder(os.path.join(self.working_directory, folder_name), tyepe_filter)
             print(f"รายการเคสทดสอบในโฟลเดอร์ {folder_name} ถูกดึงเรียบร้อยแล้ว")
             print(f"พบ {len(files_case)} ไฟล์ในโฟลเดอร์ {folder_name}")
-            if files_case:
-                for filename, size in files_case:
-                    print(f"ไฟล์: {filename}, ขนาด: {size} bytes")
-            else:
-                print(f"ไม่พบไฟล์ในโฟลเดอร์ {folder_name}")
+            # if files_case:
+            #     for filename, size in files_case:
+            #         print(f"ไฟล์: {filename}, ขนาด: {size} bytes")
+            # else:
+            #     print(f"ไม่พบไฟล์ในโฟลเดอร์ {folder_name}")
 
-            return []
-        
-    def list_files_in_folder(self, folder_path):
+            return files_case
+
+    def list_files_in_folder(self, folder_path, tyepe_filter=None):
         files_case = []
         if not os.path.exists(folder_path):
             return files_case
@@ -165,6 +165,9 @@ class RoboBuddyLogic:
         for filename in os.listdir(folder_path):
             filepath = os.path.join(folder_path, filename)
             if os.path.isfile(filepath):
-                size = os.path.getsize(filepath)
-                files_case.append((filename, size))
+                # เช็กนามสกุลไฟล์ (lower เผื่อไว้กันพิมพ์ใหญ่เล็ก)
+                if filename.lower().endswith(tyepe_filter):
+                    size = os.path.getsize(filepath)
+                    files_case.append((filename, size))
         return files_case
+
