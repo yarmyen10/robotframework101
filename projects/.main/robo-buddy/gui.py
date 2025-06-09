@@ -291,11 +291,12 @@ class RoboBuddy(ttk.Frame):
         ## starting sample directory
         file_entry.insert(END, self.robo_logic.working_directory)
 
+        self.robo_logic.get_case_list('cases')
         ## treeview and backup logs
         for x in range(20, 35):
             result = choices(['Backup Up', 'Missed in Destination'])[0]
-            st.insert(END, f'19:34:{x}\t\t Uploading: D:/file_{x}.txt\n')
-            st.insert(END, f'19:34:{x}\t\t Upload {result}.\n')
+            # st.insert(END, f'19:34:{x}\t\t Uploading: D:/file_{x}.txt\n')
+            # st.insert(END, f'19:34:{x}\t\t Upload {result}.\n')
             timestamp = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
             tv.insert('', END, x,
                       values=(f'sample_file_{x}.txt',

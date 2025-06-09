@@ -5,4 +5,4 @@ Resource    ../resource/prove-step.resource
 *** Test Cases ***
 Test Demo2 Case1
     [Documentation]    ตัวอย่างการใช้ Run TestCase
-    Run TestCase    PATH=E:\\robotframework101\\projects\\demo2\\uitestingplayground-2025-5-13-13-30-11.csv    ROW_SKIP=2
+    Run TestCase    PATH=D:\\.w\\repositories\\Test\\robotframework101\\projects\\demo2\\10-2025-6-9-16-22-25.csv    ROW_SKIP=2

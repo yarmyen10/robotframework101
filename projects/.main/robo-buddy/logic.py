@@ -57,7 +57,19 @@ class RoboBuddyLogic:
         else:
             print(f"พบ robobuddy.ini แล้วที่ {ini_path}")
 
+        self.set_default_folder_basic(robo_buddy_folder)
+
         return ini_path
+    
+    def set_default_folder_basic(self, working_directory: str):
+        robo_buddy_folder_basic = os.path.join(working_directory, "cases")
+
+        # ถ้า folder Robo Buddy ยังไม่มี ให้สร้าง
+        if not os.path.exists(robo_buddy_folder_basic):
+            os.makedirs(robo_buddy_folder_basic)
+            print(f"สร้างโฟลเดอร์ใหม่: {robo_buddy_folder_basic}")
+
+        return robo_buddy_folder_basic
 
     def read_current_directory(self):
         self.config.read(self.ini_path)
@@ -123,3 +135,36 @@ class RoboBuddyLogic:
         with open(ini_path, 'w') as configfile:
             config.write(configfile)
         print(f"สร้าง robobuddy.ini เรียบร้อยที่ {ini_path}")
+
+
+    def check_ini_file(self, ini_path):
+        return os.path.exists(ini_path)
+
+    def get_case_list(self, folder_name: str) -> list:
+        print(f"กำลังดึงรายการเคสทดสอบ... {self.working_directory}")
+        if not self.check_ini_file(self.ini_path):
+            print(f"ไม่พบไฟล์ ini ที่ {self.ini_path}")
+            return []
+        else:
+            files_case = self.list_files_in_folder(os.path.join(self.working_directory, folder_name))
+            print(f"รายการเคสทดสอบในโฟลเดอร์ {folder_name} ถูกดึงเรียบร้อยแล้ว")
+            print(f"พบ {len(files_case)} ไฟล์ในโฟลเดอร์ {folder_name}")
+            if files_case:
+                for filename, size in files_case:
+                    print(f"ไฟล์: {filename}, ขนาด: {size} bytes")
+            else:
+                print(f"ไม่พบไฟล์ในโฟลเดอร์ {folder_name}")
+
+            return []
+        
+    def list_files_in_folder(self, folder_path):
+        files_case = []
+        if not os.path.exists(folder_path):
+            return files_case
+
+        for filename in os.listdir(folder_path):
+            filepath = os.path.join(folder_path, filename)
+            if os.path.isfile(filepath):
+                size = os.path.getsize(filepath)
+                files_case.append((filename, size))
+        return files_case
