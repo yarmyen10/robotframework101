@@ -32,6 +32,7 @@ class RoboBuddy(ttk.Frame):
             'stop-robo-dark': 'icons8_cancel_24px.png',
             'stop-robo-light': 'icons8_cancel_24px_1.png',
             'play': 'icons8_play_24px_1.png',
+            'play16' : 'icons8_play_16px.png',
             'refresh': 'icons8_refresh_24px_1.png',
             'stop-dark': 'icons8_stop_24px.png',
             'stop-light': 'icons8_stop_24px_1.png',
@@ -391,6 +392,7 @@ class RoboBuddy(ttk.Frame):
         modal.geometry(f"{modal_width}x{modal_height}+{x}+{y}")
         modal.transient(self)
         modal.grab_set()
+        
 
         modal_container = ttk.Frame(modal, padding=10)
         modal_container.pack(side=TOP, fill=BOTH, expand=True)
@@ -399,22 +401,39 @@ class RoboBuddy(ttk.Frame):
         top_frame.pack(side=TOP, fill=X, pady=(0, 10))
 
         # Entry
-        new_file_case = ttk.Entry(top_frame, textvariable='file-path')
-        new_file_case.pack(side=LEFT, fill=X, expand=True, padx=(0, 0), pady=5)
-        self.setvar('file-path', 'D:/text/myfiles/top-secret/samples/')
-
-        bottom_frame = ttk.Frame(modal_container)
-        bottom_frame.pack(side=BOTTOM, fill=X, pady=(0, 10))
-        ttk.Button(bottom_frame, text="Close", command=modal.destroy, bootstyle="danger").pack(side=RIGHT, pady=10)
+        # new_file_case = ttk.Entry(modal_container, textvariable='file-path')
+        # new_file_case.pack(side=LEFT, fill=X, expand=True, padx=(0, 0), pady=5)
+        # self.setvar('file-path', 'D:/text/myfiles/top-secret/samples/')
 
         # Button
-        btn = ttk.Button(
-            master=top_frame,
-            image='add-to-robo-dark',
-            bootstyle=(LINK, SECONDARY),
-            command=self.get_file_robo
+        # btn = ttk.Button(
+        #     master=top_frame,
+        #     image='add-to-robo-dark',
+        #     bootstyle=(LINK, SECONDARY),
+        #     command=self.get_file_robo
+        # )
+        # btn.pack(side=RIGHT)
+        
+        # --- ใส่ Separator เส้นคั่น ---
+        separator = ttk.Separator(modal, orient='horizontal')
+        separator.pack(fill=X)  # เว้นระยะนิดนึง
+
+        bottom_frame = ttk.Frame(modal, padding=(5, 5))
+        bottom_frame.pack(fill=X, padx=2)
+
+        self.buttons = []
+        self.buttons.append(
+            ttk.Button(
+                master=bottom_frame,
+                text="Cancel",
+                width=10,
+                bootstyle=DANGER,
+                command=modal.destroy,
+            )
         )
-        btn.pack(side=RIGHT)
+
+        for button in self.buttons:
+            button.pack(side=RIGHT, fill=X, padx=5, pady=5)
 
     def play_robo(self):
         # Messagebox.yesno(message='Starting Robo Script...')
@@ -436,11 +455,20 @@ class RoboBuddy(ttk.Frame):
         top_frame = ttk.Frame(modal_container)
         top_frame.pack(side=TOP, fill=X, pady=(0, 10))
 
-        lbl = ttk.Label(top_frame, text="This is a custom label")
-        lbl.pack(pady=10)
-        browser_var = ttk.StringVar()
+        # lbl = ttk.Label(top_frame, text="Select Browser to run Robo Script:")
+        # lbl.configure(font='Helvetica 12 bold')
+        # lbl.pack(pady=10)
+
+        browser_labelframe = ttk.Labelframe(
+            master=top_frame,
+            text='Browser Selection',
+            padding=(5, 5)
+        )
+        browser_labelframe.pack(fill=BOTH, expand=YES, padx=5, pady=(5, 5))
+
+        browser_var = ttk.StringVar(value='Edge')
         ttk.Radiobutton(
-            top_frame,
+            browser_labelframe,
             text="Microsoft Edge",
             image='edge_icon',
             compound="left",    # icon อยู่ซ้ายข้อความ
@@ -449,7 +477,7 @@ class RoboBuddy(ttk.Frame):
         ).pack(side=LEFT, padx=15, pady=10, anchor="w")
 
         ttk.Radiobutton(
-            top_frame,
+            browser_labelframe,
             text="Firefox",
             image='firefox_icon',
             compound="left",    # icon อยู่ซ้ายข้อความ
@@ -457,12 +485,25 @@ class RoboBuddy(ttk.Frame):
             value="Firefox"
         ).pack(side=LEFT, padx=15, pady=10, anchor="w")
 
+        info_labelframe = ttk.Labelframe(
+            master=top_frame,
+            text='Information',
+            bootstyle=INFO,
+            padding=(5, 5)
+        )
+        info_labelframe.pack(fill=BOTH, expand=YES, padx=5, pady=(5, 5))
+        lbl = ttk.Label(info_labelframe, bootstyle="inverse", text="Path: ")
+        lbl.pack(side=LEFT, padx=15, pady=10)
+        self.setvar('working-directory', self.robo_logic.working_directory)
+        path_entry = ttk.Entry(info_labelframe, state="readonly", textvariable='working-directory')
+        path_entry.pack(side=LEFT, fill=X, expand=YES, padx=(0, 15), pady=10)
+
         # --- ใส่ Separator เส้นคั่น ---
         separator = ttk.Separator(modal, orient='horizontal')
         separator.pack(fill=X)  # เว้นระยะนิดนึง
 
-        container = ttk.Frame(modal, padding=10)
-        container.pack(fill=X)
+        container = ttk.Frame(modal, padding=(5, 5))
+        container.pack(fill=X, padx=2)
 
         self.buttons = []
         self.buttons.append(
@@ -477,8 +518,10 @@ class RoboBuddy(ttk.Frame):
         self.buttons.append(
             ttk.Button(
                 master=container,
-                text="Play Robo",
-                width=10,
+                text="Robo",
+                image='play16',
+                compound=LEFT,  # icon อยู่ซ้ายข้อความ
+                width=8,
                 bootstyle=SUCCESS,
                 command=modal.destroy,
             )
