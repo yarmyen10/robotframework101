@@ -62,7 +62,7 @@ class RoboBuddyLogic:
         return ini_path
 
     def set_default_folder_basic(self, working_directory: str):
-        robo_buddy_folder_basic = os.path.join(working_directory, "cases")
+        robo_buddy_folder_basic = os.path.join(working_directory, "Cases")
 
         # ถ้า folder Robo Buddy ยังไม่มี ให้สร้าง
         if not os.path.exists(robo_buddy_folder_basic):
@@ -131,6 +131,10 @@ class RoboBuddyLogic:
             'run_mode': 'normal',
         }
 
+        config['RobotScript'] = {
+            'robo-buddy 1.0': 'robo-script/robo-buddy.robot',
+        }
+
         # เขียนไฟล์ ini
         with open(ini_path, 'w') as configfile:
             config.write(configfile)
@@ -170,4 +174,24 @@ class RoboBuddyLogic:
                     size = os.path.getsize(filepath)
                     files_case.append((filename, size))
         return files_case
+
+    def load_robot_script_from_ini(self, ini_path):
+        config = configparser.ConfigParser()
+        config.read(ini_path)
+
+        key_to_path = {}
+        key_to_label = {}
+
+        if 'RobotScript' in config:
+            for key, value in config['RobotScript'].items():
+                # แยก label และ path ออกมา
+                parts = dict(item.strip().split(':', 1) for item in value.split(';') if ':' in item)
+                label = parts.get('label')
+                path = parts.get('path')
+
+                if label and path:
+                    key_to_path[key] = path
+                    key_to_label[key] = label
+
+        return key_to_path, key_to_label
 

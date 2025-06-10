@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 from random import choices
 from functools import partial
 import ttkbootstrap as ttk
@@ -69,7 +70,7 @@ class RoboBuddy(ttk.Frame):
             text='Robo',
             image='play',
             compound=LEFT,
-            command=self.play_robo
+            command=self.play_robo_modal
         )
         btn.pack(side=LEFT, ipadx=5, ipady=5, padx=0, pady=1)
 
@@ -298,7 +299,9 @@ class RoboBuddy(ttk.Frame):
         ## starting sample directory
         file_entry.insert(END, self.robo_logic.working_directory)
 
-        files_case = self.robo_logic.get_case_list('cases', ('.csv', '.json'))
+        self.setvar('case-directory', os.path.join(self.robo_logic.working_directory, 'Cases'))
+
+        files_case = self.robo_logic.get_case_list('Cases', ('.csv', '.json'))
         ## treeview and backup logs
         if files_case:
             for filename, size in files_case:
@@ -343,8 +346,9 @@ class RoboBuddy(ttk.Frame):
         if selected_item:
             item = selected_item[0]  # เอา item ตัวแรก
             values = tv.item(item, 'values')  # ดึงข้อมูลในแถวนั้น
-            self.setvar('selected-file', values)  # เก็บชื่อไฟล์ในตัวแปร
-            print(f"Selected Filename: {values[0]}, Size: {values[1]}")
+            self.setvar('selected-file-name', values[0])  # เก็บชื่อไฟล์ในตัวแปร
+            self.setvar('selected-file-size', values[4])  # เก็บขนาดไฟล์ในตัวแปร
+            print(f"Selected Filename: {values[0]}, Size: {values[4]}")
 
     def on_treeview_double_click(self, event):
         tree = event.widget
@@ -383,8 +387,8 @@ class RoboBuddy(ttk.Frame):
         modal_height = 300
 
         # คำนวณตำแหน่งให้อยู่กลาง
-        x = self.winfo_x() + (self.winfo_width() // 2) - (modal_width // 2)
-        y = self.winfo_y() + (self.winfo_height() // 2) - (modal_height // 2)
+        x = self.winfo_x() + (self.winfo_screenwidth() // 2) - (modal_width // 2)
+        y = self.winfo_y() + (self.winfo_screenheight() // 2) - (modal_height // 2)
 
         # เปิด Toplevel (Modal)
         modal = Toplevel(self)
@@ -392,7 +396,7 @@ class RoboBuddy(ttk.Frame):
         modal.geometry(f"{modal_width}x{modal_height}+{x}+{y}")
         modal.transient(self)
         modal.grab_set()
-        
+
 
         modal_container = ttk.Frame(modal, padding=10)
         modal_container.pack(side=TOP, fill=BOTH, expand=True)
@@ -413,7 +417,7 @@ class RoboBuddy(ttk.Frame):
         #     command=self.get_file_robo
         # )
         # btn.pack(side=RIGHT)
-        
+
         # --- ใส่ Separator เส้นคั่น ---
         separator = ttk.Separator(modal, orient='horizontal')
         separator.pack(fill=X)  # เว้นระยะนิดนึง
@@ -435,19 +439,12 @@ class RoboBuddy(ttk.Frame):
         for button in self.buttons:
             button.pack(side=RIGHT, fill=X, padx=5, pady=5)
 
-    def play_robo(self):
-        # Messagebox.yesno(message='Starting Robo Script...')
-        modal_width = 600
-        modal_height = 300
-
-        x = self.winfo_x() + (self.winfo_width() // 2) - (modal_width // 2)
-        y = self.winfo_y() + (self.winfo_height() // 2) - (modal_height // 2)
-
+    def play_robo_modal(self):
         modal = Toplevel()
         modal.title("Play Robo")
-        modal.geometry(f"{modal_width}x{modal_height}+{x}+{y}")
-        modal.transient(self)
-        modal.grab_set()
+        modal.resizable(False, False)
+        modal.minsize(600, 300)
+        # modal.iconphoto(True, ttk.PhotoImage(name='logo', file=PATH / 'Robot-framework-logo.png'))
 
         modal_container = ttk.Frame(modal, padding=10)
         modal_container.pack(side=TOP, fill=BOTH, expand=True)
@@ -492,11 +489,50 @@ class RoboBuddy(ttk.Frame):
             padding=(5, 5)
         )
         info_labelframe.pack(fill=BOTH, expand=YES, padx=5, pady=(5, 5))
-        lbl = ttk.Label(info_labelframe, bootstyle="inverse", text="Path: ")
-        lbl.pack(side=LEFT, padx=15, pady=10)
-        self.setvar('working-directory', self.robo_logic.working_directory)
-        path_entry = ttk.Entry(info_labelframe, state="readonly", textvariable='working-directory')
-        path_entry.pack(side=LEFT, fill=X, expand=YES, padx=(0, 15), pady=10)
+        # Label: Folder
+        lbl_folder = ttk.Label(info_labelframe, text="Folder:", bootstyle="inverse-dark")
+        lbl_folder.grid(row=0, column=0, sticky='e', padx=(10, 5), pady=(5, 5))
+
+        # Entry: case-directory
+        entry_folder = ttk.Entry(info_labelframe, textvariable='case-directory', state='readonly')
+        entry_folder.grid(row=0, column=1, sticky='we', padx=(5, 10), pady=(5, 5))
+
+        # Label: Case
+        lbl_case = ttk.Label(info_labelframe, text="Case Name:", bootstyle="inverse-dark")
+        lbl_case.grid(row=1, column=0, sticky='e', padx=(10, 5), pady=(5, 5))
+
+        # Entry: selected-file-name
+        entry_case = ttk.Entry(info_labelframe, textvariable='selected-file-name', state='readonly')
+        entry_case.grid(row=1, column=1, sticky='we', padx=(5, 10), pady=(5, 5))
+
+        # Label: Robo Script
+        lbl_script = ttk.Label(info_labelframe, text="Robot Script:", bootstyle="inverse-dark")
+        lbl_script.grid(row=2, column=0, sticky='e', padx=(10, 5), pady=(5, 5))
+
+        # ComboBox: robo-script
+        key_to_path, key_to_label  = self.robo_logic.load_robot_script_from_ini(self.robo_logic.ini_path)
+        robo_scripts = list(key_to_label.values())
+        # robo_scripts = ['Robo Script 1', 'Robo Script 2', 'Robo Script 3']  # ตัวอย่างชื่อสคริปต์
+        robo_script_combobox = ttk.Combobox(
+            info_labelframe,
+            values=robo_scripts,
+            state='readonly',
+            textvariable='robo-script'
+        )
+        robo_script_combobox.grid(row=2, column=1, sticky='we', padx=(5, 10), pady=(5, 5))
+        if robo_scripts:
+            robo_script_combobox.current(0)
+            self.setvar('robo-script', robo_scripts[0])  # ตั้งค่าเริ่มต้นเป็นสคริปต์แรก
+        else:
+            self.setvar('robo-script', NONE)  # ถ้าไม่มีสคริปต์ ให้เป็น None
+
+        cmd_box = ScrolledText(info_labelframe, font=("Consolas", 11), wrap='word', height=6)
+        cmd_box.insert('1.0', 'robot --outputdir results --variable ENV:dev --loglevel DEBUG --listener my_listener.py')
+        cmd_box.configure(state='disabled')  # ไม่ให้แก้ไข
+        cmd_box.grid(row=3, column=0, columnspan=2, sticky='nsew', padx=(10, 10), pady=(5, 5))
+
+        # ทำให้ column 1 (Entry) ขยายเต็มที่
+        info_labelframe.columnconfigure(1, weight=1)
 
         # --- ใส่ Separator เส้นคั่น ---
         separator = ttk.Separator(modal, orient='horizontal')
@@ -531,8 +567,21 @@ class RoboBuddy(ttk.Frame):
 
         # btn = ttk.Button(modal, text="OK", command=modal.destroy)
         # btn.pack(side=BOTTOM, padx=30, pady=10)
+        # อัปเดต geometry ก่อนคำนวณ
+        modal.withdraw()
+        modal.update_idletasks()
 
-        modal.grab_set()  # ทำให้ popup เป็น modal
+        modal_width = modal.winfo_width()
+        modal_height = modal.winfo_height()
+
+        x = self.winfo_x() + (self.winfo_screenwidth() // 2) - (modal_width // 2)
+        y = self.winfo_y() + (self.winfo_screenheight() // 2) - (modal_height // 2)
+
+        modal.geometry(f"+{x}+{y}")
+        modal.transient(self)
+        modal.deiconify()
+        modal.grab_set() # ทำให้ popup เป็น modal
+
 class CollapsingFrame(ttk.Frame):
     """A collapsible frame widget that opens and closes with a click."""
 
@@ -617,6 +666,18 @@ class CollapsingFrame(ttk.Frame):
 
 if __name__ == '__main__':
 
-    app = ttk.Window("Robo Buddy")
+    app = ttk.Window("Robo Buddy", themename='darkly')
     RoboBuddy(app)
+
+    # --- Center window on screen ---
+    app.update_idletasks()
+    width = app.winfo_width()
+    height = app.winfo_height()
+    screen_width = app.winfo_screenwidth()
+    screen_height = app.winfo_screenheight()
+    x = (screen_width // 2) - (width // 2)
+    y = (screen_height // 2) - (height // 2)
+    app.geometry(f'+{x}+{y}')
+    # --- End center window ---
+
     app.mainloop()
