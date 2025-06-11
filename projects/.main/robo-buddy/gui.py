@@ -8,6 +8,7 @@ from tkinter.filedialog import askdirectory, askopenfilename
 from ttkbootstrap.dialogs import Messagebox
 from ttkbootstrap.constants import *
 from tkinter.scrolledtext import ScrolledText
+from ttkbootstrap.tooltip import ToolTip
 from pathlib import Path
 from tkinter import Toplevel
 import tkinter.font as tkFont
@@ -17,14 +18,15 @@ import threading
 
 
 PATH = Path(__file__).parent / 'assets'
-
+CURRENT_PATH = Path(__file__).parent
 
 class RoboBuddy(ttk.Frame):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.robo_logic = logic.RoboBuddyLogic(self)
         self.pack(fill=BOTH, expand=YES)
+        self.modal = {}
+        print('CURRENT_PATH:', CURRENT_PATH)
 
         image_files = {
             'properties-dark': 'icons8_settings_24px.png',
@@ -290,14 +292,14 @@ class RoboBuddy(ttk.Frame):
         scroll_cf.pack(fill=BOTH, expand=YES)
 
         output_container = ttk.Frame(scroll_cf, padding=1)
-        _value = 'Log: Running Robo Script... [Uploading file: D:/sample_file_35.txt]'
+        _value = 'Log: Robo Script...'
         self.setvar('scroll-message', _value)
+        self.setvar('scroll-message-tooltip', _value)
         self.scroll_display = ScrolledText(output_container)
         self.scroll_display.pack(fill=BOTH, expand=YES)
-        scroll_cf.add(output_container, textvariable='scroll-message')
+        scroll_cf.add(output_container, textvariable='scroll-message', texttooltip='scroll-message-tooltip')
 
         # seed with some sample data
-        self.on_run_command('ping google.com -n 4')
 
         ## starting sample directory
         file_entry.insert(END, self.robo_logic.working_directory)
@@ -466,14 +468,16 @@ class RoboBuddy(ttk.Frame):
         )
         browser_labelframe.pack(fill=BOTH, expand=YES, padx=5, pady=(5, 5))
 
-        browser_var = ttk.StringVar(value='Edge')
+        # browser_var = ttk.StringVar(value='Edge')
+        self.setvar('browser_var', 'Edge')
         ttk.Radiobutton(
             browser_labelframe,
             text="Microsoft Edge",
             image='edge_icon',
             compound="left",    # icon อยู่ซ้ายข้อความ
-            variable=browser_var,
-            value="Edge"
+            variable='browser_var',
+            value="Edge",
+            command=self.on_set_command
         ).pack(side=LEFT, padx=15, pady=10, anchor="w")
 
         ttk.Radiobutton(
@@ -481,8 +485,9 @@ class RoboBuddy(ttk.Frame):
             text="Firefox",
             image='firefox_icon',
             compound="left",    # icon อยู่ซ้ายข้อความ
-            variable=browser_var,
-            value="Firefox"
+            variable='browser_var',
+            value="Firefox",
+            command=self.on_set_command
         ).pack(side=LEFT, padx=15, pady=10, anchor="w")
 
         info_labelframe = ttk.Labelframe(
@@ -512,7 +517,7 @@ class RoboBuddy(ttk.Frame):
         lbl_script = ttk.Label(info_labelframe, text="Robot Script:", bootstyle="inverse-dark")
         lbl_script.grid(row=2, column=0, sticky='e', padx=(10, 5), pady=(5, 5))
 
-        # ComboBox: robo-script
+        # ComboBox: robot-script
         key_to_path, key_to_label  = self.robo_logic.load_robot_script_from_ini(self.robo_logic.ini_path)
         robo_scripts = list(key_to_label.values())
         # robo_scripts = ['Robo Script 1', 'Robo Script 2', 'Robo Script 3']  # ตัวอย่างชื่อสคริปต์
@@ -520,19 +525,20 @@ class RoboBuddy(ttk.Frame):
             info_labelframe,
             values=robo_scripts,
             state='readonly',
-            textvariable='robo-script'
+            textvariable='robot-script'
         )
         robo_script_combobox.grid(row=2, column=1, sticky='we', padx=(5, 10), pady=(5, 5))
         if robo_scripts:
             robo_script_combobox.current(0)
-            self.setvar('robo-script', robo_scripts[0])  # ตั้งค่าเริ่มต้นเป็นสคริปต์แรก
+            self.setvar('robot-script', robo_scripts[0])  # ตั้งค่าเริ่มต้นเป็นสคริปต์แรก
         else:
-            self.setvar('robo-script', NONE)  # ถ้าไม่มีสคริปต์ ให้เป็น None
+            self.setvar('robot-script', NONE)  # ถ้าไม่มีสคริปต์ ให้เป็น None
 
-        cmd_box = ScrolledText(info_labelframe, font=("Consolas", 11), wrap='word', height=6)
-        cmd_box.insert('1.0', 'robot --outputdir results --variable ENV:dev --loglevel DEBUG --listener my_listener.py')
-        cmd_box.configure(state='disabled')  # ไม่ให้แก้ไข
-        cmd_box.grid(row=3, column=0, columnspan=2, sticky='nsew', padx=(10, 10), pady=(5, 5))
+        self.cmd_box = ScrolledText(info_labelframe, font=("Consolas", 11), wrap='word', height=6)
+        self.on_set_command()  # เรียกใช้เพื่อใส่คำสั่งเริ่มต้น
+        self.cmd_box.tag_configure("bold", font=("Consolas", 11, "bold"))
+        self.cmd_box.configure(state='disabled')  # ไม่ให้แก้ไข
+        self.cmd_box.grid(row=3, column=0, columnspan=2, sticky='nsew', padx=(10, 10), pady=(5, 5))
 
         # ทำให้ column 1 (Entry) ขยายเต็มที่
         info_labelframe.columnconfigure(1, weight=1)
@@ -544,8 +550,8 @@ class RoboBuddy(ttk.Frame):
         container = ttk.Frame(modal, padding=(5, 5))
         container.pack(fill=X, padx=2)
 
-        self.buttons = []
-        self.buttons.append(
+        buttons = []
+        buttons.append(
             ttk.Button(
                 master=container,
                 text="Cancel",
@@ -554,7 +560,7 @@ class RoboBuddy(ttk.Frame):
                 command=modal.destroy,
             )
         )
-        self.buttons.append(
+        buttons.append(
             ttk.Button(
                 master=container,
                 text="Robo",
@@ -562,10 +568,10 @@ class RoboBuddy(ttk.Frame):
                 compound=LEFT,  # icon อยู่ซ้ายข้อความ
                 width=8,
                 bootstyle=SUCCESS,
-                command=modal.destroy,
+                command=self.on_run_command,
             )
         )
-        for button in self.buttons:
+        for button in buttons:
             button.pack(side=RIGHT, fill=X, padx=5, pady=5)
 
         # btn = ttk.Button(modal, text="OK", command=modal.destroy)
@@ -584,13 +590,35 @@ class RoboBuddy(ttk.Frame):
         modal.transient(self)
         modal.deiconify()
         modal.grab_set() # ทำให้ popup เป็น modal
+        self.modal['play_robo_modal'] = modal
 
-    def on_run_command(self, command):
+    def on_set_command(self):
+        """Set command to run Robo Script"""
+        print(f"Browser selected: {self.getvar('browser_var')}")
+        command = f'robot --variable BROWSER_VAR:{self.getvar('browser_var')} --outputdir results --loglevel DEBUG --listener my_listener.py'
+        self.cmd_box.configure(state='normal')
+        self.cmd_box.delete('1.0', 'end')
+        self.cmd_box.insert('1.0', command)
+        self.setvar('robot-command', command)
+
+    def on_run_command(self, command=None):
+        """Run the command in a separate thread and display output in scrollable text area."""
+        if command is None:
+            command = self.getvar('robot-command')
+            if not command:
+                Messagebox.show_error("No command set to run.")
+                return
         print(f"Running command: {command}")
+        self.modal['play_robo_modal'].destroy()
         def task():
+            max_length = 80
+            short_command = command if len(command) <= max_length else command[:max_length] + "..."
+            self.setvar('scroll-message', f'Log: Running command: {short_command}')
+            self.setvar('scroll-message-tooltip', command)
             process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, text=True)
             print(f"Process started with PID: {process.pid}")
-            self.setvar('scroll-message', f'Log: Running command: {command}')
+            self.scroll_display.configure(state='normal')
+            self.scroll_display.delete('1.0', 'end')  # ล้างข้อความเก่า
             for line in process.stdout:
                 self.scroll_display.insert(END, line)
                 self.scroll_display.see(END)  # Scroll ตามข้อความล่าสุด
@@ -643,8 +671,23 @@ class CollapsingFrame(ttk.Frame):
             text=title,
             bootstyle=(style_color, INVERSE)
         )
-        if kwargs.get('textvariable'):
+        if kwargs.get('texttooltip') is None and kwargs.get('textvariable') is not None:
             header.configure(textvariable=kwargs.get('textvariable'))
+        if kwargs.get('texttooltip') is not None and kwargs.get('textvariable') is not None:
+            header.configure(textvariable=kwargs.get('textvariable'))
+            print(f"Text tooltip: {kwargs.get('texttooltip')}")
+            # ดึงชื่อของ tooltip variable
+            tooltip_var_name = kwargs.get('texttooltip')
+
+            # ดึงค่าเริ่มต้นมาแสดง tooltip
+            tooltip_var = ttk.StringVar(name=tooltip_var_name)
+            tooltip = ToolTip(header, text=tooltip_var.get())
+
+            # ผูก trace เพื่ออัปเดต tooltip ทุกครั้งที่ตัวแปรเปลี่ยน
+            def update_tooltip(*_):
+                tooltip.text = tooltip_var.get()
+            tooltip_var.trace_add('write', update_tooltip)
+
         header.pack(side=LEFT, fill=BOTH, padx=10)
 
         # header toggle button
