@@ -12,6 +12,8 @@ from pathlib import Path
 from tkinter import Toplevel
 import tkinter.font as tkFont
 import logic
+import subprocess
+import threading
 
 
 PATH = Path(__file__).parent / 'assets'
@@ -290,11 +292,12 @@ class RoboBuddy(ttk.Frame):
         output_container = ttk.Frame(scroll_cf, padding=1)
         _value = 'Log: Running Robo Script... [Uploading file: D:/sample_file_35.txt]'
         self.setvar('scroll-message', _value)
-        st = ScrolledText(output_container)
-        st.pack(fill=BOTH, expand=YES)
+        self.scroll_display = ScrolledText(output_container)
+        self.scroll_display.pack(fill=BOTH, expand=YES)
         scroll_cf.add(output_container, textvariable='scroll-message')
 
         # seed with some sample data
+        self.on_run_command('ping google.com -n 4')
 
         ## starting sample directory
         file_entry.insert(END, self.robo_logic.working_directory)
@@ -582,6 +585,20 @@ class RoboBuddy(ttk.Frame):
         modal.deiconify()
         modal.grab_set() # ทำให้ popup เป็น modal
 
+    def on_run_command(self, command):
+        print(f"Running command: {command}")
+        def task():
+            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, text=True)
+            print(f"Process started with PID: {process.pid}")
+            self.setvar('scroll-message', f'Log: Running command: {command}')
+            for line in process.stdout:
+                self.scroll_display.insert(END, line)
+                self.scroll_display.see(END)  # Scroll ตามข้อความล่าสุด
+            process.stdout.close()
+            process.wait()
+
+        threading.Thread(target=task).start()
+
 class CollapsingFrame(ttk.Frame):
     """A collapsible frame widget that opens and closes with a click."""
 
@@ -670,6 +687,7 @@ if __name__ == '__main__':
     RoboBuddy(app)
 
     # --- Center window on screen ---
+    app.withdraw()
     app.update_idletasks()
     width = app.winfo_width()
     height = app.winfo_height()
@@ -678,6 +696,7 @@ if __name__ == '__main__':
     x = (screen_width // 2) - (width // 2)
     y = (screen_height // 2) - (height // 2)
     app.geometry(f'+{x}+{y}')
+    app.deiconify()
     # --- End center window ---
 
     app.mainloop()
