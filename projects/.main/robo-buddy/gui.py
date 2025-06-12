@@ -595,7 +595,18 @@ class RoboBuddy(ttk.Frame):
     def on_set_command(self):
         """Set command to run Robo Script"""
         print(f"Browser selected: {self.getvar('browser_var')}")
-        command = f'robot --variable BROWSER_VAR:{self.getvar('browser_var')} --outputdir results --loglevel DEBUG --listener my_listener.py'
+        # Create a list of command parts
+        command_parts = [
+            f"robot",
+            f"--variable BROWSER_VAR:{self.getvar('browser_var')}",
+            f"--variable BROWSER_VAR:{self.getvar('browser_var')}",
+            "--outputdir results",
+            "--loglevel DEBUG",
+            "--listener my_listener.py"
+        ]
+
+        # Join the list into a single string with a space separator
+        command = " ".join(command_parts)
         self.cmd_box.configure(state='normal')
         self.cmd_box.delete('1.0', 'end')
         self.cmd_box.insert('1.0', command)
