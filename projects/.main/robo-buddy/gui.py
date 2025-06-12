@@ -18,7 +18,7 @@ import threading
 
 
 PATH = Path(__file__).parent / 'assets'
-CURRENT_PATH = Path(__file__).parent
+PROJECTS_PATH = Path(__file__).parent.parent.parent
 
 class RoboBuddy(ttk.Frame):
     def __init__(self, *args, **kwargs):
@@ -26,7 +26,7 @@ class RoboBuddy(ttk.Frame):
         self.robo_logic = logic.RoboBuddyLogic(self)
         self.pack(fill=BOTH, expand=YES)
         self.modal = {}
-        print('CURRENT_PATH:', CURRENT_PATH)
+        print('PROJECTS_PATH:', PROJECTS_PATH)
 
         image_files = {
             'properties-dark': 'icons8_settings_24px.png',
@@ -468,14 +468,14 @@ class RoboBuddy(ttk.Frame):
         )
         browser_labelframe.pack(fill=BOTH, expand=YES, padx=5, pady=(5, 5))
 
-        # browser_var = ttk.StringVar(value='Edge')
-        self.setvar('browser_var', 'Edge')
+        # open_browser = ttk.StringVar(value='Edge')
+        self.setvar('open_browser', 'Edge')
         ttk.Radiobutton(
             browser_labelframe,
             text="Microsoft Edge",
             image='edge_icon',
             compound="left",    # icon อยู่ซ้ายข้อความ
-            variable='browser_var',
+            variable='open_browser',
             value="Edge",
             command=self.on_set_command
         ).pack(side=LEFT, padx=15, pady=10, anchor="w")
@@ -485,7 +485,7 @@ class RoboBuddy(ttk.Frame):
             text="Firefox",
             image='firefox_icon',
             compound="left",    # icon อยู่ซ้ายข้อความ
-            variable='browser_var',
+            variable='open_browser',
             value="Firefox",
             command=self.on_set_command
         ).pack(side=LEFT, padx=15, pady=10, anchor="w")
@@ -594,15 +594,24 @@ class RoboBuddy(ttk.Frame):
 
     def on_set_command(self):
         """Set command to run Robo Script"""
-        print(f"Browser selected: {self.getvar('browser_var')}")
+        print(f"Browser selected: {self.getvar('open_browser')}")
+        key_to_path, key_to_label  = self.robo_logic.load_robot_script_from_ini(self.robo_logic.ini_path)
+        print(f'key_to_path= {key_to_path}')
+        print(f'key_to_label= {key_to_label}')
+        key_robot_script = next((k for k, v in key_to_label.items() if v == self.getvar('robot-script')), None)
+        path = Path(self.getvar('case-directory')) / self.getvar('selected-file-name')
+        path_case = str(path.resolve())
+        path = Path(PROJECTS_PATH) / key_to_path.get(key_robot_script)
+        path_robot_script = str(path.resolve())
         # Create a list of command parts
         command_parts = [
             f"robot",
-            f"--variable BROWSER_VAR:{self.getvar('browser_var')}",
-            f"--variable BROWSER_VAR:{self.getvar('browser_var')}",
-            "--outputdir results",
+            f"--variable \"OPEN_BROWSER:{self.getvar('open_browser')}\"",
+            f"--variable \"PATH_CASE:{path_case}\"",
+            # "--outputdir results",
             "--loglevel DEBUG",
-            "--listener my_listener.py"
+            # "--listener my_listener.py",
+            f"\"{path_robot_script}\""
         ]
 
         # Join the list into a single string with a space separator
@@ -621,6 +630,9 @@ class RoboBuddy(ttk.Frame):
                 return
         print(f"Running command: {command}")
         self.modal['play_robo_modal'].destroy()
+        # หลัง self.scroll_display = ScrolledText(output_container)
+        self.scroll_display.tag_configure("red", foreground="red")
+        self.scroll_display.tag_configure("green", foreground="green")
         def task():
             max_length = 80
             short_command = command if len(command) <= max_length else command[:max_length] + "..."
@@ -631,12 +643,50 @@ class RoboBuddy(ttk.Frame):
             self.scroll_display.configure(state='normal')
             self.scroll_display.delete('1.0', 'end')  # ล้างข้อความเก่า
             for line in process.stdout:
-                self.scroll_display.insert(END, line)
-                self.scroll_display.see(END)  # Scroll ตามข้อความล่าสุด
+                self.insert_log_with_pass_highlight(line)
+                # self.scroll_display.insert(END, line)
+                # self.scroll_display.see(END)  # Scroll ตามข้อความล่าสุด
             process.stdout.close()
             process.wait()
 
         threading.Thread(target=task).start()
+
+    def insert_log_with_pass_highlight(self, text):
+        """
+        Insert log text into the scroll_display widget, highlighting specific keywords.
+        """
+        self.scroll_display.configure(state='normal')
+        keywords = {
+            'PASS': 'green',
+            'FAIL': 'red',
+            'ERROR': 'red',
+            'SKIP': 'orange',
+            'WARN': 'orange',
+            'WARNING': 'orange',
+        }
+        idx = 0
+        text_len = len(text)
+        while idx < text_len:
+            # Find the next keyword occurrence
+            next_pos = text_len
+            next_key = None
+            for key in keywords:
+                pos = text.find(key, idx)
+                if pos != -1 and pos < next_pos:
+                    next_pos = pos
+                    next_key = key
+            if next_key is None:
+                # No more keywords, insert the rest
+                self.scroll_display.insert('end', text[idx:])
+                break
+            # Insert text before the keyword
+            if next_pos > idx:
+                self.scroll_display.insert('end', text[idx:next_pos])
+            # Insert the keyword with tag
+            self.scroll_display.insert('end', next_key, keywords[next_key])
+            idx = next_pos + len(next_key)
+        self.scroll_display.see('end')
+        self.scroll_display.configure(state='disabled')
 
 class CollapsingFrame(ttk.Frame):
     """A collapsible frame widget that opens and closes with a click."""

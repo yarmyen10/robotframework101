@@ -7,12 +7,14 @@ Library    ../lib/ReadRecord.py
 Resource    kw.resource
 
 *** Variables ***
+${OPEN_BROWSER}    Edge
 @{LIST_OBJECTS}    ${EMPTY}
 ${OPEN_STATUS}    ${EMPTY}
 
 *** Keywords ***
 Run TestCase
     [Arguments]    ${PATH}    ${ROW_SKIP}
+    # Log To Console    ${OPEN_BROWSER}
     # Log To Console    ${PATH}
     @{LIST_OBJECTS}=    Read CSV File Test Case    ${PATH}    ${ROW_SKIP}
     # Log To Console    ${LIST_OBJECTS}
@@ -23,6 +25,7 @@ Run TestCase
         ${_CSSSELECTOR}=    Set Variable    ${ITEM['cssSelector']}
         # Log To Console    ${_XPATH}
         ${LOWER_STEP}=    Evaluate    '${_STEP}'.lower()
+        ${IS_START_WITH_OPEN_WEBSITE}=      Evaluate    '${LOWER_STEP}'.startswith('open website')
         ${IS_START_WITH_ENTER}=             Evaluate    '${LOWER_STEP}'.startswith('enter')
         ${IS_START_WITH_CLICK_ON}=          Evaluate    '${LOWER_STEP}'.startswith('click on')
         ${IS_START_WITH_SELECT}=            Evaluate    '${LOWER_STEP}'.startswith('select')
@@ -34,6 +37,11 @@ Run TestCase
         ${IS_START_WITH_EXTERNAL_STEP}=     Evaluate    '${LOWER_STEP}'.startswith('external step')
         Sleep    500ms
         # Wait Until Keyword Succeeds    1min    2s    Execute JavaScript    return document.readyState == 'complete';
+
+        IF    ${IS_START_WITH_OPEN_WEBSITE}
+            ${_STEP}=    Set Variable    Open website ${OPEN_BROWSER}
+        END
+
 
         IF    '${_STEP}' == 'Open website Edge'
             ${OPEN_STATUS}=    Open Website Bypass SSL Warning Using Capabilities in Edge2    baseurl=${_DATA}    headless=${False}
