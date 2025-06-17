@@ -1,5 +1,5 @@
 from datetime import datetime
-import os
+import sys, os
 from random import choices
 from functools import partial
 import ttkbootstrap as ttk
@@ -610,6 +610,7 @@ class RoboBuddy(ttk.Frame):
         outputdir = str(path.resolve())
         # Create a list of command parts
         command_parts = [
+            sys.executable, "-m",
             f"robot",
             "--name \"📦 Test Suite\"",
             f"--variable \"OPEN_BROWSER:{self.getvar('open_browser')}\"",
