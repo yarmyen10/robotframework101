@@ -16,10 +16,14 @@ import logic
 import subprocess
 import threading
 import utils
-
+import logging
 
 PATH = Path(__file__).parent / 'assets'
-PROJECTS_PATH = Path(__file__).parent.parent.parent
+if getattr(sys, 'frozen', False):
+    PROJECTS_PATH = Path(sys.executable).parent.parent.parent.parent
+    logging.debug('PROJECTS_PATH:', PROJECTS_PATH)
+else:
+    PROJECTS_PATH = Path(__file__).parent.parent.parent
 
 class RoboBuddy(ttk.Frame):
     def __init__(self, *args, **kwargs):
@@ -610,7 +614,7 @@ class RoboBuddy(ttk.Frame):
         outputdir = str(path.resolve())
         # Create a list of command parts
         command_parts = [
-            sys.executable, "-m",
+            #sys.executable, "-m",
             f"robot",
             "--name \"📦 Test Suite\"",
             f"--variable \"OPEN_BROWSER:{self.getvar('open_browser')}\"",
@@ -795,10 +799,9 @@ class CollapsingFrame(ttk.Frame):
 
 
 if __name__ == '__main__':
-
+    logging.basicConfig(filename="robo_buddy.log", level=logging. DEBUG)
     app = ttk.Window("Robo Buddy", themename='darkly')
     RoboBuddy(app)
-
     # --- Center window on screen ---
     app.withdraw()
     app.update_idletasks()

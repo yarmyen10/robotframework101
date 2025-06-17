@@ -132,7 +132,7 @@ class RoboBuddyLogic:
         }
 
         config['RobotScript'] = {
-            'robo_buddy_1': 'label: Robo Buddy 1; path: ./scripts/robo_buddy_1.py',
+            'robo_buddy_1': 'label:Robo-Buddy 1.0; path:robo-script/robo-buddy.robot',
         }
 
         # เขียนไฟล์ ini
