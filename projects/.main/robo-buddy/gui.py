@@ -15,6 +15,7 @@ import tkinter.font as tkFont
 import logic
 import subprocess
 import threading
+from utils import RoboBuddyUtils as utils
 
 
 PATH = Path(__file__).parent / 'assets'
@@ -297,6 +298,7 @@ class RoboBuddy(ttk.Frame):
         self.setvar('scroll-message-tooltip', _value)
         self.scroll_display = ScrolledText(output_container)
         self.scroll_display.pack(fill=BOTH, expand=YES)
+        self.scroll_display.bind("<Key>", utils.ignore_typing)
         scroll_cf.add(output_container, textvariable='scroll-message', texttooltip='scroll-message-tooltip')
 
         # seed with some sample data
@@ -492,7 +494,7 @@ class RoboBuddy(ttk.Frame):
 
         info_labelframe = ttk.Labelframe(
             master=top_frame,
-            text='Information',
+            text='Command Execution Details',
             bootstyle=INFO,
             padding=(5, 5)
         )
@@ -537,7 +539,7 @@ class RoboBuddy(ttk.Frame):
         self.cmd_box = ScrolledText(info_labelframe, font=("Consolas", 11), wrap='word', height=6)
         self.on_set_command()  # เรียกใช้เพื่อใส่คำสั่งเริ่มต้น
         self.cmd_box.tag_configure("bold", font=("Consolas", 11, "bold"))
-        self.cmd_box.configure(state='disabled')  # ไม่ให้แก้ไข
+        #self.cmd_box.configure(state='disabled')  # ไม่ให้แก้ไข
         self.cmd_box.grid(row=3, column=0, columnspan=2, sticky='nsew', padx=(10, 10), pady=(5, 5))
 
         # ทำให้ column 1 (Entry) ขยายเต็มที่
@@ -603,15 +605,20 @@ class RoboBuddy(ttk.Frame):
         path_case = str(path.resolve())
         path = Path(PROJECTS_PATH) / key_to_path.get(key_robot_script)
         path_robot_script = str(path.resolve())
+        path = Path(self.getvar('case-directory')).parent / 'results'
+        outputdir = str(path.resolve())
         # Create a list of command parts
         command_parts = [
             f"robot",
+            "--name \"📦 Test Suite\"",
             f"--variable \"OPEN_BROWSER:{self.getvar('open_browser')}\"",
             f"--variable \"PATH_CASE:{path_case}\"",
-            # "--outputdir results",
+            f"--outputdir \"{outputdir}\"",
             "--loglevel DEBUG",
+            #"--consolewidth 120",
             # "--listener my_listener.py",
             f"\"{path_robot_script}\""
+
         ]
 
         # Join the list into a single string with a space separator
@@ -686,7 +693,7 @@ class RoboBuddy(ttk.Frame):
             self.scroll_display.insert('end', next_key, keywords[next_key])
             idx = next_pos + len(next_key)
         self.scroll_display.see('end')
-        self.scroll_display.configure(state='disabled')
+        # self.scroll_display.configure(state='disabled')
 
 class CollapsingFrame(ttk.Frame):
     """A collapsible frame widget that opens and closes with a click."""
