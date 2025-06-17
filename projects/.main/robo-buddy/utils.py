@@ -1,3 +1,4 @@
+import sys, os
 class RoboBuddyUtils:
     @staticmethod
     def get_project_root() -> str:
@@ -20,3 +21,12 @@ class RoboBuddyUtils:
         if (event.state & 0x10000) and event.keysym.lower() == 'c':  # macOS
             return None
         return "break"  # บล็อก key อื่น
+
+    @staticmethod
+    def resource_path(relative_path):
+        try:
+            base_path = sys._MEIPASS  # เมื่อถูก pack โดย pyinstaller
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)

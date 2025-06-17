@@ -15,7 +15,7 @@ import tkinter.font as tkFont
 import logic
 import subprocess
 import threading
-from utils import RoboBuddyUtils as utils
+import utils
 
 
 PATH = Path(__file__).parent / 'assets'
@@ -25,6 +25,7 @@ class RoboBuddy(ttk.Frame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.robo_logic = logic.RoboBuddyLogic(self)
+        self.robo_utils = utils.RoboBuddyUtils()
         self.pack(fill=BOTH, expand=YES)
         self.modal = {}
         print('PROJECTS_PATH:', PROJECTS_PATH)
@@ -51,7 +52,7 @@ class RoboBuddy(ttk.Frame):
         self.photoimages = []
         imgpath = Path(__file__).parent / 'assets'
         for key, val in image_files.items():
-            _path = imgpath / val
+            _path = self.robo_utils.resource_path(imgpath / val)
             self.photoimages.append(ttk.PhotoImage(name=key, file=_path))
 
         # buttonbar
@@ -298,7 +299,7 @@ class RoboBuddy(ttk.Frame):
         self.setvar('scroll-message-tooltip', _value)
         self.scroll_display = ScrolledText(output_container)
         self.scroll_display.pack(fill=BOTH, expand=YES)
-        self.scroll_display.bind("<Key>", utils.ignore_typing)
+        self.scroll_display.bind("<Key>", self.robo_utils.ignore_typing)
         scroll_cf.add(output_container, textvariable='scroll-message', texttooltip='scroll-message-tooltip')
 
         # seed with some sample data
