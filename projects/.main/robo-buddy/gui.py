@@ -21,7 +21,7 @@ import logging
 PATH = Path(__file__).parent / 'assets'
 if getattr(sys, 'frozen', False):
     PROJECTS_PATH = Path(sys.executable).parent.parent.parent.parent
-    logging.debug('PROJECTS_PATH:', PROJECTS_PATH)
+    logging.info('PROJECTS_PATH:', PROJECTS_PATH)
 else:
     PROJECTS_PATH = Path(__file__).parent.parent.parent
 
@@ -358,6 +358,7 @@ class RoboBuddy(ttk.Frame):
         if selected_item:
             item = selected_item[0]  # เอา item ตัวแรก
             values = tv.item(item, 'values')  # ดึงข้อมูลในแถวนั้น
+            self.setvar('selected-test-name', os.path.splitext(values[0])[0])  # เก็บชื่อไฟล์ในตัวแปร
             self.setvar('selected-file-name', values[0])  # เก็บชื่อไฟล์ในตัวแปร
             self.setvar('selected-file-size', values[4])  # เก็บขนาดไฟล์ในตัวแปร
             print(f"Selected Filename: {values[0]}, Size: {values[4]}")
@@ -512,17 +513,26 @@ class RoboBuddy(ttk.Frame):
         entry_folder = ttk.Entry(info_labelframe, textvariable='case-directory', state='readonly')
         entry_folder.grid(row=0, column=1, sticky='we', padx=(5, 10), pady=(5, 5))
 
-        # Label: Case
-        lbl_case = ttk.Label(info_labelframe, text="Case Name:", bootstyle="inverse-dark")
-        lbl_case.grid(row=1, column=0, sticky='e', padx=(10, 5), pady=(5, 5))
+        # Label: File Case
+        lbl_filecase = ttk.Label(info_labelframe, text="File Case:", bootstyle="inverse-dark")
+        lbl_filecase.grid(row=1, column=0, sticky='e', padx=(10, 5), pady=(5, 5))
 
         # Entry: selected-file-name
         entry_case = ttk.Entry(info_labelframe, textvariable='selected-file-name', state='readonly')
         entry_case.grid(row=1, column=1, sticky='we', padx=(5, 10), pady=(5, 5))
 
+        # Label: Test Name
+        lbl_testname = ttk.Label(info_labelframe, text="Test Name:", bootstyle="inverse-dark")
+        lbl_testname.grid(row=2, column=0, sticky='e', padx=(10, 5), pady=(5, 5))
+
+        # Entry: selected-test-name
+        entry_testname = ttk.Entry(info_labelframe, textvariable='selected-test-name', state='normal')
+        entry_testname.grid(row=2, column=1, sticky='we', padx=(5, 10), pady=(5, 5))
+        entry_testname.bind("<KeyRelease>", self.on_set_command)
+
         # Label: Robo Script
         lbl_script = ttk.Label(info_labelframe, text="Robot Script:", bootstyle="inverse-dark")
-        lbl_script.grid(row=2, column=0, sticky='e', padx=(10, 5), pady=(5, 5))
+        lbl_script.grid(row=3, column=0, sticky='e', padx=(10, 5), pady=(5, 5))
 
         # ComboBox: robot-script
         key_to_path, key_to_label  = self.robo_logic.load_robot_script_from_ini(self.robo_logic.ini_path)
@@ -534,7 +544,7 @@ class RoboBuddy(ttk.Frame):
             state='readonly',
             textvariable='robot-script'
         )
-        robo_script_combobox.grid(row=2, column=1, sticky='we', padx=(5, 10), pady=(5, 5))
+        robo_script_combobox.grid(row=3, column=1, sticky='we', padx=(5, 10), pady=(5, 5))
         if robo_scripts:
             robo_script_combobox.current(0)
             self.setvar('robot-script', robo_scripts[0])  # ตั้งค่าเริ่มต้นเป็นสคริปต์แรก
@@ -545,7 +555,7 @@ class RoboBuddy(ttk.Frame):
         self.on_set_command()  # เรียกใช้เพื่อใส่คำสั่งเริ่มต้น
         self.cmd_box.tag_configure("bold", font=("Consolas", 11, "bold"))
         #self.cmd_box.configure(state='disabled')  # ไม่ให้แก้ไข
-        self.cmd_box.grid(row=3, column=0, columnspan=2, sticky='nsew', padx=(10, 10), pady=(5, 5))
+        self.cmd_box.grid(row=4, column=0, columnspan=2, sticky='nsew', padx=(10, 10), pady=(5, 5))
 
         # ทำให้ column 1 (Entry) ขยายเต็มที่
         info_labelframe.columnconfigure(1, weight=1)
@@ -599,7 +609,7 @@ class RoboBuddy(ttk.Frame):
         modal.grab_set() # ทำให้ popup เป็น modal
         self.modal['play_robo_modal'] = modal
 
-    def on_set_command(self):
+    def on_set_command(self, *args):
         """Set command to run Robo Script"""
         print(f"Browser selected: {self.getvar('open_browser')}")
         key_to_path, key_to_label  = self.robo_logic.load_robot_script_from_ini(self.robo_logic.ini_path)
@@ -616,7 +626,7 @@ class RoboBuddy(ttk.Frame):
         command_parts = [
             #sys.executable, "-m",
             f"robot",
-            "--name \"📦 Test Suite\"",
+            f"--name \"{self.getvar('selected-test-name')}\"",
             f"--variable \"OPEN_BROWSER:{self.getvar('open_browser')}\"",
             f"--variable \"PATH_CASE:{path_case}\"",
             f"--outputdir \"{outputdir}\"",
