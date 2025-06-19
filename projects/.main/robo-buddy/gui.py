@@ -19,11 +19,7 @@ import utils
 import logging
 
 PATH = Path(__file__).parent / 'assets'
-if getattr(sys, 'frozen', False):
-    PROJECTS_PATH = Path(sys.executable).parent.parent.parent.parent
-    logging.info(f'PROJECTS_PATH: {PROJECTS_PATH}', )
-else:
-    PROJECTS_PATH = Path(__file__).parent.parent.parent
+PROJECTS_PATH = os.path.join(os.getcwd(), 'projects')
 
 
 
@@ -36,6 +32,9 @@ class RoboBuddy(ttk.Frame):
         self.pack(fill=BOTH, expand=YES)
         self.modal = {}
         # print('PROJECTS_PATH:', PROJECTS_PATH)
+
+        print(f"Path={Path(__file__).parent}")
+        print(f"os.path={os.path.join(os.getcwd())}")
         
 
         image_files = {
