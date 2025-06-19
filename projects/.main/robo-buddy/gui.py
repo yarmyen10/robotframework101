@@ -35,7 +35,7 @@ class RoboBuddy(ttk.Frame):
 
         print(f"Path={Path(__file__).parent}")
         print(f"os.path={os.path.join(os.getcwd())}")
-        
+
 
         image_files = {
             'properties-dark': 'icons8_settings_24px.png',
@@ -69,7 +69,7 @@ class RoboBuddy(ttk.Frame):
         ## new robo
         #_func = lambda: Messagebox.ok(message='Adding new robo')
         btn = ttk.Button(
-            master=buttonbar, text='New robo set',
+            master=buttonbar, text='New',
             image='add-to-robo-light',
             compound=LEFT,
             command=self.new_robo_modal
@@ -174,10 +174,10 @@ class RoboBuddy(ttk.Frame):
         bus_prop_btn.grid(row=4, column=0, columnspan=2, sticky=W)
 
         ## add to backup button
-        _func = lambda: Messagebox.ok(message='Adding to robo')
+        _func = lambda: Messagebox.ok(message='Adding to robot')
         add_btn = ttk.Button(
             master=bus_frm,
-            text='Add to robo',
+            text='Add Robot',
             image='add-to-robo-dark',
             compound=LEFT,
             command=_func,
@@ -559,6 +559,7 @@ class RoboBuddy(ttk.Frame):
         self.cmd_box.tag_configure("bold", font=("Consolas", 11, "bold"))
         #self.cmd_box.configure(state='disabled')  # ไม่ให้แก้ไข
         self.cmd_box.grid(row=4, column=0, columnspan=2, sticky='nsew', padx=(10, 10), pady=(5, 5))
+        self.cmd_box.bind("<KeyRelease>", self.on_command_parts)
 
         # ทำให้ column 1 (Entry) ขยายเต็มที่
         info_labelframe.columnconfigure(1, weight=1)
@@ -621,14 +622,14 @@ class RoboBuddy(ttk.Frame):
         key_robot_script = next((k for k, v in key_to_label.items() if v == self.getvar('robot-script')), None)
         path = Path(self.getvar('case-directory')) / self.getvar('selected-file-name')
         path_case = str(path.resolve())
-        path = Path(PROJECTS_PATH) / key_to_path.get(key_robot_script)
+        path = Path(os.path.join(PROJECTS_PATH, key_to_path.get(key_robot_script)))
         path_robot_script = str(path.resolve())
         path = Path(self.getvar('case-directory')).parent / 'results'
         outputdir = str(path.resolve())
         # Create a list of command parts
         python_path = os.path.join(os.getcwd(), '.venv', 'Scripts', 'python.exe')
         command_parts = [
-            f"\"{python_path}\"", 
+            f"\"{python_path}\"",
             "-m",
             #sys.executable, "-m",
             f"robot",
@@ -649,6 +650,12 @@ class RoboBuddy(ttk.Frame):
         self.cmd_box.delete('1.0', 'end')
         self.cmd_box.insert('1.0', command)
         self.setvar('robot-command', command)
+
+    def on_command_parts(self, *args):
+        # print(f"on_command_parts.args={args}")
+        content = self.cmd_box.get("1.0", END)
+        # print(f"content={content}")
+        self.setvar('robot-command', content)
 
     def on_run_command(self, command=None):
         """Run the command in a separate thread and display output in scrollable text area."""
@@ -815,7 +822,14 @@ class CollapsingFrame(ttk.Frame):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename="robo_buddy.log", level=logging. DEBUG)
+    log_path = os.path.join(Path(__file__).parent, 'log')
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+    logging.basicConfig(
+        filename=os.path.join(log_path, f"robo_buddy_{datetime.now().strftime('%Y-%m-%d')}.log"),
+        level=logging.DEBUG
+    )
+
     app = ttk.Window("Robo Buddy", themename='darkly')
     RoboBuddy(app)
     # --- Center window on screen ---
