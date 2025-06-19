@@ -365,7 +365,7 @@ class RoboBuddy(ttk.Frame):
             self.setvar('selected-test-name', os.path.splitext(values[0])[0])  # เก็บชื่อไฟล์ในตัวแปร
             self.setvar('selected-file-name', values[0])  # เก็บชื่อไฟล์ในตัวแปร
             self.setvar('selected-file-size', values[4])  # เก็บขนาดไฟล์ในตัวแปร
-            print(f"Selected Filename: {values[0]}, Size: {values[4]}")
+            # print(f"Selected Filename: {values[0]}, Size: {values[4]}")
 
     def on_treeview_double_click(self, event):
         tree = event.widget
@@ -379,7 +379,7 @@ class RoboBuddy(ttk.Frame):
         """Open dialogue to get directory and update variable"""
         self.update_idletasks()
         d = askdirectory()
-        print(f'Selected directory: {d}')
+        # print(f'Selected directory: {d}')
         if d:
             self.robo_logic.set_directory(d)
             self.setvar('folder-path', d)
@@ -394,7 +394,7 @@ class RoboBuddy(ttk.Frame):
                 ("Excel Files", "*.xlsx *.xls")
             ]
         )
-        print(f'Selected file: {f}')
+        # print(f'Selected file: {f}')
         if f:
             self.setvar('file-path', f)
 
@@ -615,10 +615,10 @@ class RoboBuddy(ttk.Frame):
 
     def on_set_command(self, *args):
         """Set command to run Robo Script"""
-        print(f"Browser selected: {self.getvar('open_browser')}")
+        # print(f"Browser selected: {self.getvar('open_browser')}")
         key_to_path, key_to_label  = self.robo_logic.load_robot_script_from_ini(self.robo_logic.ini_path)
-        print(f'key_to_path= {key_to_path}')
-        print(f'key_to_label= {key_to_label}')
+        # print(f'key_to_path= {key_to_path}')
+        # print(f'key_to_label= {key_to_label}')
         key_robot_script = next((k for k, v in key_to_label.items() if v == self.getvar('robot-script')), None)
         path = Path(self.getvar('case-directory')) / self.getvar('selected-file-name')
         path_case = str(path.resolve())
@@ -658,7 +658,7 @@ class RoboBuddy(ttk.Frame):
             if not command:
                 Messagebox.show_error("No command set to run.")
                 return
-        print(f"Running command: {command}")
+        # print(f"Running command: {command}")
         self.modal['play_robo_modal'].destroy()
         # หลัง self.scroll_display = ScrolledText(output_container)
         self.scroll_display.tag_configure("red", foreground="red")
@@ -766,7 +766,7 @@ class CollapsingFrame(ttk.Frame):
             header.configure(textvariable=kwargs.get('textvariable'))
         if kwargs.get('texttooltip') is not None and kwargs.get('textvariable') is not None:
             header.configure(textvariable=kwargs.get('textvariable'))
-            print(f"Text tooltip: {kwargs.get('texttooltip')}")
+            # print(f"Text tooltip: {kwargs.get('texttooltip')}")
             # ดึงชื่อของ tooltip variable
             tooltip_var_name = kwargs.get('texttooltip')
 

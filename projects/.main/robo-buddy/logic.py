@@ -44,7 +44,7 @@ class RoboBuddyLogic:
         # ถ้า folder Robo Buddy ยังไม่มี ให้สร้าง
         if not os.path.exists(robo_buddy_folder):
             os.makedirs(robo_buddy_folder)
-            print(f"สร้างโฟลเดอร์ใหม่: {robo_buddy_folder}")
+            # print(f"สร้างโฟลเดอร์ใหม่: {robo_buddy_folder}")
 
         # เตรียม path ของ robobuddy.ini
         ini_path = os.path.join(robo_buddy_folder, 'robobuddy.ini')
@@ -67,7 +67,7 @@ class RoboBuddyLogic:
         # ถ้า folder Robo Buddy ยังไม่มี ให้สร้าง
         if not os.path.exists(robo_buddy_folder_basic):
             os.makedirs(robo_buddy_folder_basic)
-            print(f"สร้างโฟลเดอร์ใหม่: {robo_buddy_folder_basic}")
+            # print(f"สร้างโฟลเดอร์ใหม่: {robo_buddy_folder_basic}")
 
         return robo_buddy_folder_basic
 
