@@ -21,18 +21,22 @@ import logging
 PATH = Path(__file__).parent / 'assets'
 if getattr(sys, 'frozen', False):
     PROJECTS_PATH = Path(sys.executable).parent.parent.parent.parent
-    logging.info('PROJECTS_PATH:', PROJECTS_PATH)
+    logging.info(f'PROJECTS_PATH: {PROJECTS_PATH}', )
 else:
     PROJECTS_PATH = Path(__file__).parent.parent.parent
+
+
 
 class RoboBuddy(ttk.Frame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Messagebox.ok(message=f"sys.executable:\n{sys.executable}")
         self.robo_logic = logic.RoboBuddyLogic(self)
         self.robo_utils = utils.RoboBuddyUtils()
         self.pack(fill=BOTH, expand=YES)
         self.modal = {}
-        print('PROJECTS_PATH:', PROJECTS_PATH)
+        # print('PROJECTS_PATH:', PROJECTS_PATH)
+        
 
         image_files = {
             'properties-dark': 'icons8_settings_24px.png',
@@ -623,7 +627,10 @@ class RoboBuddy(ttk.Frame):
         path = Path(self.getvar('case-directory')).parent / 'results'
         outputdir = str(path.resolve())
         # Create a list of command parts
+        python_path = os.path.join(os.getcwd(), '.venv', 'Scripts', 'python.exe')
         command_parts = [
+            f"\"{python_path}\"", 
+            "-m",
             #sys.executable, "-m",
             f"robot",
             f"--name \"{self.getvar('selected-test-name')}\"",
